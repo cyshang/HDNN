@@ -11,6 +11,8 @@ using std::setw;
 using std::setprecision;
 using std::left;
 
+//shit---------------
+
 using std::cout;
 
 const SymFunction * Molecule::pSymFunc = NULL;
