@@ -12,7 +12,7 @@
 struct FunctionInfo {
 	int nFunc;
 	int element;
-	std::vector<FuncType> symFunc;	
+	FuncType *symFunc;
 
 	FunctionInfo(const int &_element);
 	~FunctionInfo();

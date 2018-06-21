@@ -9,13 +9,18 @@ struct SymFunction;
 
 struct Molecule {
 	
-	struct AdjAtom;
-
 	static const SymFunction *pSymFunc;
 	static int dimX;
 	double energy;
 	std::vector<Atom> atoms;
-	std::vector<std::vector<AdjAtom> > adjAtoms;
+	
+	double *atom_distance;
+	double *atom_cos0;
+	double *G3_R2_sum;
+	double *G4_R2_sum;
+	double *G2_cutoff;
+	double *G3_cutoff;
+	double *G4_cutoff;
 
 	Molecule();
 	void Init();
@@ -28,13 +33,6 @@ struct Molecule {
 	void OutputInfo();
 };
 
-struct Molecule::AdjAtom
-{
-	int element;
-	double distance;
-	Eigen::VectorXd Rij;
 
-	AdjAtom() :Rij(3) {}
-};
 
 #endif // !MOLECULE_H_

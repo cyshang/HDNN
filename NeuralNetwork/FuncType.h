@@ -11,11 +11,12 @@ struct FuncType {
 
 	int cutoff_func;
 	int sym_func;
-	std::vector<int> elements;
-	std::vector<double> FuncParameter;
-	std::vector<double> parameters_copy;
+	int elements[2];
+	double FuncParameter[4];
+	double parameters_copy[4];
 
 	FuncType();
+	~FuncType();
 	void GetFuncType(const std::string & str);
 	void Backup();
 	void Restore();
