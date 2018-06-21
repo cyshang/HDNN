@@ -9,11 +9,7 @@ struct FunctionInfo;
 struct Molecule;
 
 struct Atom {
-	typedef double (Atom::*CUTOFF_FUNC)(double, double);
-	typedef double (Atom::*SYM_FUNC)(const FuncType &);
 
-	static CUTOFF_FUNC CutoffFunc[2];
-	static SYM_FUNC SymFunc[4];
 	const FunctionInfo *pFunc;
 	const Molecule *pMolecule;
 	int iAtom;
