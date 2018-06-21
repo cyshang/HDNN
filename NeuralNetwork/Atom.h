@@ -10,13 +10,7 @@ struct Molecule;
 
 struct Atom {
 
-	const FunctionInfo *pFunc;
-	const Molecule *pMolecule;
-	int iAtom;
-	int element;
-	int nFunc;
 	Eigen::VectorXd R;
-
 
 	Atom(const Molecule *_p);
 	void Init(const int &_iAtom);
