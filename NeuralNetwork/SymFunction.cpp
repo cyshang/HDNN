@@ -140,7 +140,7 @@ bool SymFunction::GetData()
 
 	//--------Calculate AdjAtom matrix for every molecule
 	for (size_t iSample = 0; iSample < parameter.nSample; ++iSample) {
-		pMolecules[iSample]->CalAdjAtom();
+		pMolecules[iSample]->CalMidValue();
 	}
 
 	return false;

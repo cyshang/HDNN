@@ -45,7 +45,7 @@ void Molecule::GetInput(istream & Input) {
 
 }
 
-void Molecule::CalAdjAtom() {
+void Molecule::CalMidValue() {
 	int iAtom, jAtom;
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom)
 		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {

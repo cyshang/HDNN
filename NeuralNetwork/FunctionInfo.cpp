@@ -20,13 +20,13 @@ void FunctionInfo::GetInfo(istream & getInfo, const int & _nFunc)
 	int iFunc;
 	string inputStr;
 
-	symFunc.resize(nFunc);
+	funcType.resize(nFunc);
 
 	for (iFunc = 0; iFunc < nFunc; ++iFunc) {
 		std::getline(getInfo, inputStr);
-		symFunc[iFunc].GetFuncType(inputStr);
+		funcType[iFunc].GetFuncType(inputStr);
 #ifdef DEBUG_FUNCTIONINFO
-		debug << symFunc[iFunc].OutputFuncType() << endl;
+		debug << funcType[iFunc].OutputFuncType() << endl;
 #endif // DEBUG_MODE
 	}
 }
@@ -36,27 +36,27 @@ void FunctionInfo::OutputInfo(ostream & outInfo)
 	outInfo << parameter.num_to_element[element] << " " << nFunc << endl;
 	
 	for (int iFunc = 0; iFunc < nFunc; ++iFunc) {
-		outInfo << symFunc[iFunc].OutputFuncType() << endl;
+		outInfo << funcType[iFunc].OutputFuncType() << endl;
 	}
 }
 
 void FunctionInfo::PerturbFunc()
 {
 	for (int iFunc = 0; iFunc < nFunc; ++iFunc) {
-		symFunc[iFunc].Perturbation();
+		funcType[iFunc].Perturbation();
 	}
 }
 
 void FunctionInfo::BackupFunc()
 {
 	for (int iFunc = 0; iFunc < nFunc; ++iFunc) {
-		symFunc[iFunc].Backup();
+		funcType[iFunc].Backup();
 	}
 }
 
 void FunctionInfo::RestoreFunc()
 {
 	for (int iFunc = 0; iFunc < nFunc; ++iFunc) {
-		symFunc[iFunc].Restore();
+		funcType[iFunc].Restore();
 	}
 }

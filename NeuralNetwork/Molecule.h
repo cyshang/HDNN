@@ -25,7 +25,7 @@ struct Molecule {
 	Molecule();
 	void Init();
 	void GetInput(std::istream & Input);
-	void CalAdjAtom();
+	void CalMidValue();
 	void CalOutput();
 	void Output(std::ostream & Dataout);
 	void OutputDistance(std::ofstream * pDout);
