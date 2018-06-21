@@ -12,9 +12,11 @@ struct SymFunction {
 	NeuralNetwork *pNetwork;
 	MonteCarloSetting *pMCsetting;	
 
-
 	std::vector<FunctionInfo*> pFunctionInfo;
 	std::vector<Molecule*> pMolecules;
+
+	double *outputX;
+	double *outputEnergy;
 
 	SymFunction();
 	~SymFunction();
