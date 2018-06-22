@@ -60,7 +60,7 @@ void Molecule::GetInput(istream & Input) {
 
 void Molecule::CalMidValue() {
 	int iAtom, jAtom, kAtom;
-	VectorXd Rij(3);
+	VectorXd Rij(3), Rik(3);
 
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
@@ -73,11 +73,21 @@ void Molecule::CalMidValue() {
 		}
 	}
 
+	
+	int nCol = (parameter.nAtom * (parameter.nAtom - 1)) / 2;
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+		int nPass = 0;
 		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
 			for (kAtom = jAtom + 1; kAtom < parameter.nAtom; ++kAtom) {
+				if (iAtom == jAtom || iAtom == kAtom) {
+					atom_cos0[iAtom * nCol + nPass] = 0;
+				}
+				else {
 
+				}
+				++nPass;
 			}
+			
 		}
 	}
 }
