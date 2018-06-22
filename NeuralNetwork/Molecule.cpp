@@ -1,4 +1,7 @@
 #include "Molecule.h"
+#include "SymFunction.h"
+#include "FunctionInfo.h"
+#include "FuncType.h"
 #include <Eigen/Core>
 
 using namespace Eigen;
@@ -59,25 +62,34 @@ void Molecule::GetInput(istream & Input) {
 }
 
 void Molecule::CalMidValue() {
+
+	nFunc.resize(parameter.nElement);
+	for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
+		nFunc[iElement] = pSymFunc->pFunctionInfo[iElement]->nFunc;
+	}
+
 	int iAtom, jAtom, kAtom;
+	const int nAtom = parameter.nAtom;
 	VectorXd Rij(3), Rik(3), Rjk(3);
 
-	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
+	//Calculate atom_distance matrix
+	for (iAtom = 0; iAtom < nAtom; ++iAtom) {
+		for (jAtom = 0; jAtom < nAtom; ++jAtom) {
 			if (iAtom == jAtom)
-				atom_distance[iAtom * parameter.nAtom + jAtom] = 0;
+				atom_distance[iAtom * nAtom + jAtom] = 0;
 			else {
 				Rij = atoms[jAtom].R - atoms[iAtom].R;
-				atom_distance[iAtom * parameter.nAtom + jAtom] = Rij.norm();
+				atom_distance[iAtom * nAtom + jAtom] = Rij.norm();
 			}
 		}
 	}
 	
-	int nCol = (parameter.nAtom * (parameter.nAtom - 1)) / 2;
-	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	//Calculate atom_cos0, G3_R2_sum, G4_R2_sum
+	int nCol = (nAtom * (nAtom - 1)) / 2;
+	for (iAtom = 0; iAtom < nAtom; ++iAtom) {
 		int nPass = 0;
-		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
-			for (kAtom = jAtom + 1; kAtom < parameter.nAtom; ++kAtom) {
+		for (jAtom = 0; jAtom < nAtom; ++jAtom) {
+			for (kAtom = jAtom + 1; kAtom < nAtom; ++kAtom) {
 				if (iAtom == jAtom || iAtom == kAtom) {
 					atom_cos0[iAtom * nCol + nPass] = 0;
 					G3_R2_sum[iAtom * nCol + nPass] = 0;
@@ -95,6 +107,37 @@ void Molecule::CalMidValue() {
 				//------
 				++nPass;
 			}			
+		}
+	}
+
+	cutoff_func = new double**[parameter.nElement];
+	for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
+		cutoff_func[iElement] = new double*[nFunc[iElement]];
+		for (int iFunc = 0; iFunc < nFunc[iElement]; ++iFunc) {
+			cutoff_func[iElement][iFunc] = new double[nAtom * nAtom];
+		}
+	}
+
+	double relative_distance;
+	for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
+		for (int iFunc = 0; iFunc < nFunc[iElement]; ++iFunc) {
+			const FuncType *pFuncType = pSymFunc->pFunctionInfo[iElement]->funcType + iFunc;
+			for (iAtom = 0; iAtom < nAtom; ++iAtom) {
+				for (jAtom = 0; jAtom < nAtom; ++jAtom) {
+					if (iAtom == jAtom) {
+						cutoff_func[iElement][iFunc][iAtom * nAtom + jAtom] = 0;
+					}
+					else {
+						relative_distance = atom_distance[iAtom * nAtom + jAtom] / pFuncType->FuncParameter[0];
+						if (pFuncType->cutoff_func == 0) {
+							cutoff_func[iElement][iFunc][iAtom * nAtom + jAtom] = (relative_distance > 1) ? 0 : (0.5 * (std::cos(PI * relative_distance) + 1));
+						}
+						else {
+							cutoff_func[iElement][iFunc][iAtom * nAtom + jAtom] = (relative_distance > 1) ? 0 : (std::tanh(1 - relative_distance) * std::tanh(1 - relative_distance) * std::tanh(1 - relative_distance));
+						}
+					}
+				}
+			}
 		}
 	}
 }

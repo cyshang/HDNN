@@ -12,7 +12,8 @@ struct Molecule {
 	static const SymFunction *pSymFunc;
 	double energy;
 	std::vector<Atom> atoms;
-	
+	std::vector<int> nFunc;
+
 	double *atom_distance;
 	double *atom_cos0;
 	double *G3_R2_sum;
@@ -23,13 +24,9 @@ struct Molecule {
 	~Molecule();
 	void GetInput(std::istream & Input);
 	void CalMidValue();
-	void CalOutput();
-	void Output(std::ostream & Dataout);
 	void OutputDistance(std::ofstream * pDout);
 	void OutputAngle(std::ofstream * pAout);
 	void OutputInfo();
 };
-
-
 
 #endif // !MOLECULE_H_
