@@ -75,7 +75,7 @@ void Molecule::CalMidValue() {
 	
 	unsigned int nCol = (parameter.nAtom * (parameter.nAtom - 1)) / 2;
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		int nPass = 0;
+		unsigned int nPass = 0;
 		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
 			for (kAtom = jAtom + 1; kAtom < parameter.nAtom; ++kAtom) {
 				if (iAtom == jAtom || iAtom == kAtom) {
@@ -91,8 +91,7 @@ void Molecule::CalMidValue() {
 					atom_cos0[iAtom * nCol + nPass] = Rij.dot(Rik) / (Rij.norm() * Rik.norm());
 					G3_R2_sum[iAtom * nCol + nPass] = Rij.squaredNorm() + Rik.squaredNorm() + Rjk.squaredNorm();
 					G4_R2_sum[iAtom * nCol + nPass] = Rij.squaredNorm() + Rik.squaredNorm();
-				}
-				
+				}				
 				//------
 				++nPass;
 			}			
@@ -100,48 +99,15 @@ void Molecule::CalMidValue() {
 	}
 }
 
-void Molecule::CalOutput() {
-
-	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		atoms[iAtom].CalOutput();
-	}
-
-}
-
-void Molecule::Output(ostream & Dataout) {
-
-	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		atoms[iAtom].Output(Dataout);
-	}
-	Dataout << std::setprecision(16) << energy;
-
-}
 
 void Molecule::OutputDistance(ofstream * pDout)
 {
-	unsigned int iAtom, jAtom;
-	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
-			if (iAtom == jAtom) continue;
-			pDout[iAtom] << setprecision(15) << setw(20) << left << adjAtoms[iAtom][jAtom].distance;
-		}
-		pDout[iAtom] << endl;
-	}
+
 }
 
 void Molecule::OutputAngle(ofstream * pAout)
 {
-	int i, j, k;
-	double cos0;
-	for (i = 0; i < parameter.nAtom; ++i) {
-		for (j = 0; j < parameter.nAtom; ++j)
-			for (k = j + 1; k < parameter.nAtom; ++k) {
-				if (i == j || i == k) continue;
-				cos0 = adjAtoms[i][j].Rij.dot(adjAtoms[i][k].Rij) / (adjAtoms[i][j].distance*adjAtoms[i][k].distance);
-				pAout[i] << setprecision(15) << setw(20) << left << cos0;
-			}
-		pAout[i] << endl;
-	}
+
 }
 
 void Molecule::OutputInfo()
