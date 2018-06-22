@@ -9,11 +9,11 @@ struct FuncType {
 
 	static const MonteCarloSetting * pMCsetting;
 
-	int cutoff_func;
-	int sym_func;
-	int elements[2];
 	double FuncParameter[4];
 	double parameters_copy[4];
+	int cutoff_func;
+	int sym_func;
+	int elements[2]; 
 
 	FuncType();
 	~FuncType();

@@ -18,8 +18,8 @@ Molecule::Molecule()
 	:atoms(parameter.nAtom, Atom(this)), energy(0),
 	atom_distance(NULL), atom_cos0(NULL), G3_R2_sum(NULL), G4_R2_sum(NULL)
 {
-	unsigned int length_radial = parameter.nAtom * parameter.nAtom;
-	unsigned int length_angular = parameter.nAtom * ((parameter.nAtom * (parameter.nAtom - 1)) / 2);
+	int length_radial = parameter.nAtom * parameter.nAtom;
+	int length_angular = parameter.nAtom * ((parameter.nAtom * (parameter.nAtom - 1)) / 2);
 
 	atom_distance = new double[length_radial];
 	atom_cos0 = new double[length_angular];
@@ -52,14 +52,14 @@ void Molecule::GetInput(istream & Input) {
 		Input.ignore(1024, '\n');
 	}
 
-	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		atoms[iAtom].GetInput(Input);
 	}
 
 }
 
 void Molecule::CalMidValue() {
-	unsigned int iAtom, jAtom, kAtom;
+	int iAtom, jAtom, kAtom;
 	VectorXd Rij(3), Rik(3), Rjk(3);
 
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
@@ -73,9 +73,9 @@ void Molecule::CalMidValue() {
 		}
 	}
 	
-	unsigned int nCol = (parameter.nAtom * (parameter.nAtom - 1)) / 2;
+	int nCol = (parameter.nAtom * (parameter.nAtom - 1)) / 2;
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		unsigned int nPass = 0;
+		int nPass = 0;
 		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
 			for (kAtom = jAtom + 1; kAtom < parameter.nAtom; ++kAtom) {
 				if (iAtom == jAtom || iAtom == kAtom) {

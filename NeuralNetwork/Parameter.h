@@ -51,7 +51,7 @@ struct Parameter {
 	int nElement;	//	The number of elements in this system
 	void get_nElement(std::istream & in) { in >> nElement; }
 
-	unsigned int nAtom;		//	The total number of atoms in this system
+	int nAtom;		//	The total number of atoms in this system
 	void get_nAtom(std::istream & in) { in >> nAtom; }
 
 	Str_to_Int element_to_num;	//	A map convert an element's name into it's number
@@ -68,7 +68,7 @@ struct Parameter {
 	std::vector<std::string> atom_list;	// A list recording each atom's name in this system
 	void get_atom_list(std::istream & in) {
 		atom_list.resize(nAtom);
-		for (unsigned int i = 0; i < nAtom; ++i) {
+		for (int i = 0; i < nAtom; ++i) {
 			in >> atom_list[i];
 		}
 	}

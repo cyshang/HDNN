@@ -35,7 +35,7 @@ SymFunction::SymFunction()
 	}
 
 	atom_list = new int[parameter.nAtom];
-	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		atom_list[iAtom] = parameter.element_to_num[parameter.atom_list[iAtom]];
 	}
 
@@ -119,18 +119,18 @@ void SymFunction::Construct()
 
 	//Calculate static int <dimX> in struct <Molecule>
 	dimX = 0;
-	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		dimX += pFunctionInfo[atom_list[iAtom]]->nFunc;
 	}
 
 	nFunc = new int[parameter.nAtom];
-	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		nFunc[iAtom] = pFunctionInfo[atom_list[iAtom]]->nFunc;
 	}
 
 	pFuncType = new FuncType*[dimX];
 	int nowFunc = 0;
-	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		for (int iFunc = 0; iFunc < nFunc[iAtom]; ++iFunc) {
 			pFuncType[nowFunc + iFunc] = pFunctionInfo[atom_list[iAtom]]->funcType + iFunc;
 		}
@@ -140,9 +140,6 @@ void SymFunction::Construct()
 	outputX = new double[parameter.nSample * dimX];
 	outputEnergy = new double[parameter.nSample];
 
-	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
-		pMolecules[iSample]->Init();
-	}
 }
 
 bool SymFunction::GetData()
@@ -328,7 +325,37 @@ void SymFunction::SaveFuncInfo(double Err)
 
 void SymFunction::CalOutput()
 {
-	
+	long iSample;
+	long nSample = parameter.nSample;
+	for (iSample = 0; iSample < nSample; ++iSample) {
+		
+		const double *distance = pMolecules[iSample]->atom_distance;
+		const double *cos0 = pMolecules[iSample]->atom_cos0;
+		const double *G3_R2_sum = pMolecules[iSample]->G3_R2_sum;
+		const double *G4_R2_sum = pMolecules[iSample]->G4_R2_sum;
+
+		int iRow = 0;
+		int nAtom = parameter.nAtom;
+		for (int iAtom = 0; iAtom < nAtom; ++iAtom) {
+			for (int iFunc = 0; iFunc < nFunc[iAtom]; ++iFunc) {
+				
+				if (pFuncType[iRow]->sym_func == 1) {
+
+				}
+				else if (pFuncType[iRow]->sym_func == 2) {
+
+				}
+				else if (pFuncType[iRow]->sym_func == 3) {
+
+				}
+				else {
+
+				}
+				//---
+				++iRow;
+			}
+		}
+	}
 }
 
 void SymFunction::CalSymFunction()

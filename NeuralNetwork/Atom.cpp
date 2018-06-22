@@ -48,7 +48,7 @@ double Atom::G1(const FuncType & func)
 {
 	//	FuncParam = {Rc};
 	double sum = 0;
-	unsigned int jAtom;
+	int jAtom;
 	const int & iCut = func.cutoff_func;
 	const double &Rc = func.FuncParameter[0];
 
@@ -64,7 +64,7 @@ double Atom::G2(const FuncType & func)
 	//	FuncParam = {Rc, Rs, eta};
 	double sum = 0;
 	double cutoff, distance;
-	unsigned int jAtom;
+	int jAtom;
 	const int & iCut = func.cutoff_func;
 	const double &Rc = func.FuncParameter[0];
 	const double &Rs = func.FuncParameter[1];
@@ -97,7 +97,7 @@ double Atom::G3(const FuncType & func)
 
 	bool Ifcontinue;
 
-	unsigned int jAtom, kAtom;
+	int jAtom, kAtom;
 
 	for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom)
 		for (kAtom = jAtom + 1; kAtom < parameter.nAtom; ++kAtom) {
@@ -139,7 +139,7 @@ double Atom::G4(const FuncType & func)
 
 	bool Ifcontinue;
 
-	unsigned int jAtom, kAtom;
+	int jAtom, kAtom;
 
 	for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom)
 		for (kAtom = jAtom + 1; kAtom < parameter.nAtom; ++kAtom) {
