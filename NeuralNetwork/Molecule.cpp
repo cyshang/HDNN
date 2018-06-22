@@ -16,7 +16,7 @@ const SymFunction * Molecule::pSymFunc = NULL;
 
 Molecule::Molecule()
 	:atoms(parameter.nAtom, Atom(this)), energy(0),
-	atom_distance(NULL), atom_cos0(NULL), G3_R2_sum(NULL), G4_R2_sum(NULL), G2_cutoff(NULL), G3_cutoff(NULL), G4_cutoff(NULL)
+	atom_distance(NULL), atom_cos0(NULL), G3_R2_sum(NULL), G4_R2_sum(NULL)
 {
 	int length_radial = parameter.nAtom * parameter.nAtom;
 	int length_angular = parameter.nAtom * ((parameter.nAtom * (parameter.nAtom - 1)) / 2);
@@ -27,9 +27,6 @@ Molecule::Molecule()
 	G3_R2_sum = new double[length_angular];
 	G4_R2_sum = new double[length_angular];
 
-	G2_cutoff = new double[length_radial];
-	G3_cutoff = new double[length_angular];
-	G4_cutoff = new double[length_angular];
 }
 
 Molecule::~Molecule()
@@ -38,9 +35,6 @@ Molecule::~Molecule()
 	delete[] atom_cos0;
 	delete[] G3_R2_sum;
 	delete[] G4_R2_sum;
-	delete[] G2_cutoff;
-	delete[] G3_cutoff;
-	delete[] G4_cutoff;
 }
 
 
@@ -79,7 +73,13 @@ void Molecule::CalMidValue() {
 		}
 	}
 
+	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
+			for (kAtom = jAtom + 1; kAtom < parameter.nAtom; ++kAtom) {
 
+			}
+		}
+	}
 }
 
 void Molecule::CalOutput() {
