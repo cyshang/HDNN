@@ -17,6 +17,7 @@ struct Molecule {
 	double *atom_cos0;
 	double *G3_R2_sum;
 	double *G4_R2_sum;
+	double ***cutoff_func;
 
 	Molecule();
 	~Molecule();

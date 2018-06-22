@@ -338,12 +338,17 @@ void SymFunction::CalOutput()
 		int nAtom = parameter.nAtom;
 		for (int iAtom = 0; iAtom < nAtom; ++iAtom) {
 			int jAtom, kAtom;
-
+			/*
+#	G1: {Rc}
+#	G2: {Rc, Rs, eta}
+#	G3: {Rc, lambda, eta, xi}
+#	G4: {Rc, lambda, eta, xi}
+			*/
 			for (int iFunc = 0; iFunc < nFunc[iAtom]; ++iFunc) {
 				
 				if (pFuncType[iRow]->sym_func == 1 && pFuncType[iRow]->cutoff_func == 1) {
 					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
-
+						 
 					}
 					outputX[iSample * dimX + iRow] = 0;
 
