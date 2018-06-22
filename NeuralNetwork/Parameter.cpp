@@ -86,7 +86,7 @@ void Parameter::OutputDebug(std::ostream & out)
 		out << num_to_element[i] << "<->" << element_to_num[num_to_element[i]] << endl;
 	}
 	out << "atom list:" << endl;
-	for (int i = 0; i < nAtom; ++i) {
+	for (unsigned int i = 0; i < nAtom; ++i) {
 		out << atom_list[i] << " ";
 	}
 	out << endl;

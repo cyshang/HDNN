@@ -18,8 +18,8 @@ Molecule::Molecule()
 	:atoms(parameter.nAtom, Atom(this)), energy(0),
 	atom_distance(NULL), atom_cos0(NULL), G3_R2_sum(NULL), G4_R2_sum(NULL)
 {
-	int length_radial = parameter.nAtom * parameter.nAtom;
-	int length_angular = parameter.nAtom * ((parameter.nAtom * (parameter.nAtom - 1)) / 2);
+	unsigned int length_radial = parameter.nAtom * parameter.nAtom;
+	unsigned int length_angular = parameter.nAtom * ((parameter.nAtom * (parameter.nAtom - 1)) / 2);
 
 	atom_distance = new double[length_radial];
 	atom_cos0 = new double[length_angular];
@@ -52,14 +52,14 @@ void Molecule::GetInput(istream & Input) {
 		Input.ignore(1024, '\n');
 	}
 
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		atoms[iAtom].GetInput(Input);
 	}
 
 }
 
 void Molecule::CalMidValue() {
-	int iAtom, jAtom, kAtom;
+	unsigned int iAtom, jAtom, kAtom;
 	VectorXd Rij(3), Rik(3), Rjk(3);
 
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
@@ -73,7 +73,7 @@ void Molecule::CalMidValue() {
 		}
 	}
 	
-	int nCol = (parameter.nAtom * (parameter.nAtom - 1)) / 2;
+	unsigned int nCol = (parameter.nAtom * (parameter.nAtom - 1)) / 2;
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		int nPass = 0;
 		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
@@ -102,7 +102,7 @@ void Molecule::CalMidValue() {
 
 void Molecule::CalOutput() {
 
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		atoms[iAtom].CalOutput();
 	}
 
@@ -110,7 +110,7 @@ void Molecule::CalOutput() {
 
 void Molecule::Output(ostream & Dataout) {
 
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		atoms[iAtom].Output(Dataout);
 	}
 	Dataout << std::setprecision(16) << energy;
@@ -119,7 +119,7 @@ void Molecule::Output(ostream & Dataout) {
 
 void Molecule::OutputDistance(ofstream * pDout)
 {
-	int iAtom, jAtom;
+	unsigned int iAtom, jAtom;
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
 			if (iAtom == jAtom) continue;

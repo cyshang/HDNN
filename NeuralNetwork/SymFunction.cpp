@@ -35,7 +35,7 @@ SymFunction::SymFunction()
 	}
 
 	atom_list = new int[parameter.nAtom];
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		atom_list[iAtom] = parameter.element_to_num[parameter.atom_list[iAtom]];
 	}
 
@@ -119,18 +119,18 @@ void SymFunction::Construct()
 
 	//Calculate static int <dimX> in struct <Molecule>
 	dimX = 0;
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		dimX += pFunctionInfo[atom_list[iAtom]]->nFunc;
 	}
 
 	nFunc = new int[parameter.nAtom];
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		nFunc[iAtom] = pFunctionInfo[atom_list[iAtom]]->nFunc;
 	}
 
 	pFuncType = new FuncType*[dimX];
 	int nowFunc = 0;
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+	for (unsigned int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		for (int iFunc = 0; iFunc < nFunc[iAtom]; ++iFunc) {
 			pFuncType[nowFunc + iFunc] = pFunctionInfo[atom_list[iAtom]]->funcType + iFunc;
 		}
