@@ -23,7 +23,6 @@ struct Molecule {
 
 	Molecule();
 	~Molecule();
-	void Init();
 	void GetInput(std::istream & Input);
 	void CalMidValue();
 	void CalOutput();

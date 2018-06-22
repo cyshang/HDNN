@@ -43,12 +43,7 @@ Molecule::~Molecule()
 	delete[] G4_cutoff;
 }
 
-void Molecule::Init() {
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		atoms[iAtom].Init(iAtom);
-	}
 
-}
 
 void Molecule::GetInput(istream & Input) {
 	//Ignore first line, which contains the number of atoms

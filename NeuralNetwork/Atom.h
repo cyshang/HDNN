@@ -13,7 +13,6 @@ struct Atom {
 	Eigen::VectorXd R;
 
 	Atom(const Molecule *_p);
-	void Init(const int &_iAtom);
 	void GetInput(std::istream & Input);
 	void OutputInfo();
 };

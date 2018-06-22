@@ -19,15 +19,6 @@ Atom::SYM_FUNC Atom::SymFunc[4] = { &Atom::G1, &Atom::G2, &Atom::G3, &Atom::G4 }
 
 Atom::Atom(const Molecule *_p) :pMolecule(_p), R(3) {}
 
-void Atom::Init(const int &_iAtom) 
-{
-	iAtom = _iAtom;
-	element = parameter.element_to_num[parameter.atom_list[iAtom]];
-	pFunc = pMolecule->pSymFunc->pFunctionInfo[element];
-	nFunc = pFunc->nFunc;
-	if (nFunc)
-		outputX.resize(nFunc);
-}
 
 void Atom::GetInput(istream & Input) 
 {
