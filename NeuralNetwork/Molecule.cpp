@@ -60,7 +60,7 @@ void Molecule::GetInput(istream & Input) {
 
 void Molecule::CalMidValue() {
 	int iAtom, jAtom, kAtom;
-	VectorXd Rij(3), Rik(3);
+	VectorXd Rij(3), Rik(3), Rjk(3);
 
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
@@ -72,7 +72,6 @@ void Molecule::CalMidValue() {
 			}
 		}
 	}
-
 	
 	int nCol = (parameter.nAtom * (parameter.nAtom - 1)) / 2;
 	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
@@ -81,13 +80,22 @@ void Molecule::CalMidValue() {
 			for (kAtom = jAtom + 1; kAtom < parameter.nAtom; ++kAtom) {
 				if (iAtom == jAtom || iAtom == kAtom) {
 					atom_cos0[iAtom * nCol + nPass] = 0;
+					G3_R2_sum[iAtom * nCol + nPass] = 0;
+					G4_R2_sum[iAtom * nCol + nPass] = 0;
 				}
 				else {
+					Rij = atoms[jAtom].R - atoms[iAtom].R;
+					Rik = atoms[kAtom].R - atoms[iAtom].R;
+					Rjk = atoms[jAtom].R - atoms[kAtom].R;
 
+					atom_cos0[iAtom * nCol + nPass] = Rij.dot(Rik) / (Rij.norm() * Rik.norm());
+					G3_R2_sum[iAtom * nCol + nPass] = Rij.squaredNorm() + Rik.squaredNorm() + Rjk.squaredNorm();
+					G4_R2_sum[iAtom * nCol + nPass] = Rij.squaredNorm() + Rik.squaredNorm();
 				}
+				
+				//------
 				++nPass;
-			}
-			
+			}			
 		}
 	}
 }
