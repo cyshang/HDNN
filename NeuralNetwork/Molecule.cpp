@@ -15,13 +15,39 @@ using std::cout;
 const SymFunction * Molecule::pSymFunc = NULL;
 
 Molecule::Molecule()
-	:atoms(parameter.nAtom, Atom(this)), adjAtoms(parameter.nAtom, vector<AdjAtom>(parameter.nAtom)), energy(0)
-{}
+	:atoms(parameter.nAtom, Atom(this)), energy(0),
+	atom_distance(NULL), atom_cos0(NULL), G3_R2_sum(NULL), G4_R2_sum(NULL), G2_cutoff(NULL), G3_cutoff(NULL), G4_cutoff(NULL)
+{
+	int length_radial = parameter.nAtom * (parameter.nAtom - 1);
+	int length_angular = parameter.nAtom * ((parameter.nAtom - 1) * (parameter.nAtom - 2) / 2);
+
+	atom_distance = new double[length_radial];
+	atom_cos0 = new double[length_angular];
+
+	G3_R2_sum = new double[length_angular];
+	G4_R2_sum = new double[length_angular];
+
+	G2_cutoff = new double[length_radial];
+	G3_cutoff = new double[length_angular];
+	G4_cutoff = new double[length_angular];
+}
+
+Molecule::~Molecule()
+{
+	delete[] atom_distance;
+	delete[] atom_cos0;
+	delete[] G3_R2_sum;
+	delete[] G4_R2_sum;
+	delete[] G2_cutoff;
+	delete[] G3_cutoff;
+	delete[] G4_cutoff;
+}
 
 void Molecule::Init() {
 	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		atoms[iAtom].Init(iAtom);
 	}
+
 }
 
 void Molecule::GetInput(istream & Input) {

@@ -22,6 +22,7 @@ struct Molecule {
 	double *G4_cutoff;
 
 	Molecule();
+	~Molecule();
 	void Init();
 	void GetInput(std::istream & Input);
 	void CalMidValue();
