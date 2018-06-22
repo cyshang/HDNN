@@ -18,17 +18,25 @@ using std::left;
 using namespace Eigen;
 
 SymFunction::SymFunction()
-	:pNetwork(NULL), pMCsetting(NULL),
-	pFunctionInfo(parameter.nElement, NULL), pMolecules(parameter.nSample, NULL)
+	:pNetwork(NULL), pMCsetting(NULL), pFunctionInfo(NULL), pMolecules(NULL), pFuncType(NULL),
+	atom_list(NULL), nFunc(NULL), outputX(NULL), outputEnergy(NULL)
 {
+
 	//Generate the vector of struct FunctionInfo
+	pFunctionInfo = new FunctionInfo*[parameter.nElement];
 	for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
 		pFunctionInfo[iElement] = new FunctionInfo(iElement);
 	}
 
 	//Generate the vector of struct Molecule
-	for (size_t iSample = 0; iSample < parameter.nSample; ++iSample) {
+	pMolecules = new Molecule*[parameter.nSample];
+	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
 		pMolecules[iSample] = new Molecule;
+	}
+
+	atom_list = new int[parameter.nAtom];
+	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+		atom_list[iAtom] = parameter.element_to_num[parameter.atom_list[iAtom]];
 	}
 
 	//Link the static pointer pSymFunc to struct SymFunction
@@ -54,16 +62,23 @@ SymFunction::~SymFunction()
 	for (int i = 0; i < parameter.nElement; ++i) {
 		delete pFunctionInfo[i];
 	}
+	delete[] pFunctionInfo;
 
-	for (size_t i = 0; i < parameter.nSample; ++i) {
+	for (long i = 0; i < parameter.nSample; ++i) {
 		delete pMolecules[i];
 	}
+	delete[] pMolecules;
 
 	if (pMCsetting){
 		FuncType::pMCsetting = NULL;
 		delete pMCsetting;
 	}
 	
+	delete[] pFuncType;
+	delete[] atom_list;
+	delete[] nFunc;
+	delete[] outputX;
+	delete[] outputEnergy;
 }
 
 void SymFunction::Construct()
@@ -103,12 +118,29 @@ void SymFunction::Construct()
 	}
 
 	//Calculate static int <dimX> in struct <Molecule>
-	Molecule::dimX = 0;
+	dimX = 0;
 	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		Molecule::dimX += pFunctionInfo[parameter.element_to_num[parameter.atom_list[iAtom]]]->nFunc;
+		dimX += pFunctionInfo[atom_list[iAtom]]->nFunc;
 	}
 
-	for (size_t iSample = 0; iSample < parameter.nSample; ++iSample) {
+	nFunc = new int[parameter.nAtom];
+	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+		nFunc[iAtom] = pFunctionInfo[atom_list[iAtom]]->nFunc;
+	}
+
+	pFuncType = new FuncType*[dimX];
+	int nowFunc = 0;
+	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+		for (int iFunc = 0; iFunc < nFunc[iAtom]; ++iFunc) {
+			pFuncType[nowFunc + iFunc] = pFunctionInfo[atom_list[iAtom]]->funcType + iFunc;
+		}
+		nowFunc += nFunc[iAtom];
+	}
+
+	outputX = new double[parameter.nSample * dimX];
+	outputEnergy = new double[parameter.nSample];
+
+	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
 		pMolecules[iSample]->Init();
 	}
 }
@@ -132,14 +164,14 @@ bool SymFunction::GetData()
 		return true;
 	}
 
-	for (size_t iSample = 0; iSample < parameter.nSample; ++iSample) {
+	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
 		pMolecules[iSample]->GetInput(din);
 	}
 	din.close();
 	//--------Data input complete
 
 	//--------Calculate AdjAtom matrix for every molecule
-	for (size_t iSample = 0; iSample < parameter.nSample; ++iSample) {
+	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
 		pMolecules[iSample]->CalMidValue();
 	}
 
@@ -148,23 +180,7 @@ bool SymFunction::GetData()
 
 void SymFunction::OutputToNetwork(const bool IfEnergy)
 {
-	size_t iSample;
-	int iAtom, iFunc;
-	int totFunc, nowFunc;
-	for (iSample = 0; iSample < parameter.nSample; ++iSample) {
 
-		totFunc = 0;
-		for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-
-			nowFunc = pMolecules[iSample]->atoms[iAtom].nFunc;
-			for (iFunc = 0; iFunc < nowFunc; ++iFunc) {
-				pNetwork->rawX(totFunc + iFunc, iSample) = pMolecules[iSample]->atoms[iAtom].outputX[iFunc];
-			}
-			totFunc += nowFunc;
-		}
-		if (IfEnergy)
-			pNetwork->rawEnergy(iSample) = pMolecules[iSample]->energy;
-	}
 }
 
 void SymFunction::SymFuncOpt()
@@ -188,7 +204,7 @@ void SymFunction::SymFuncOpt()
 	int nAccept = 0;
 	bool IfLastAccept = true;
 
-	size_t iSample;	
+	long iSample;
 	for (iSample = 0; iSample < parameter.nSample; ++iSample) {
 		pMolecules[iSample]->CalOutput();
 	}
@@ -310,6 +326,11 @@ void SymFunction::SaveFuncInfo(double Err)
 	fout.close();
 }
 
+void SymFunction::CalOutput()
+{
+	
+}
+
 void SymFunction::CalSymFunction()
 {
 	string FileName;
@@ -318,7 +339,7 @@ void SymFunction::CalSymFunction()
 	FileName = parameter.input_folder + parameter.fNetworkData;
 	fout.open(FileName.c_str(), ofstream::out);
 
-	for (size_t iSample = 0; iSample < parameter.nSample; ++iSample) {
+	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
 #ifdef OUTPUT_TO_SCREEN
 		if (!(iSample % 10))
 			std::cout << "iSample " << iSample << endl;
@@ -333,7 +354,7 @@ void SymFunction::CalSymFunction()
 
 void SymFunction::RunPES()
 {
-	for (size_t iSample = 0; iSample < parameter.nSample; ++iSample) {
+	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
 		pMolecules[iSample]->CalOutput();
 	}
 	OutputToNetwork(false);

@@ -14,8 +14,6 @@ using std::cout;
 
 const SymFunction * Molecule::pSymFunc = NULL;
 
-int Molecule::dimX = 0;
-
 Molecule::Molecule()
 	:atoms(parameter.nAtom, Atom(this)), adjAtoms(parameter.nAtom, vector<AdjAtom>(parameter.nAtom)), energy(0)
 {}

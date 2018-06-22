@@ -7,14 +7,19 @@ struct FunctionInfo;
 struct Molecule;
 struct NeuralNetwork;
 struct MonteCarloSetting;
+struct FuncType;
 
 struct SymFunction {
 	NeuralNetwork *pNetwork;
 	MonteCarloSetting *pMCsetting;	
+	FuncType **pFuncType;
 
-	std::vector<FunctionInfo*> pFunctionInfo;
-	std::vector<Molecule*> pMolecules;
+	FunctionInfo **pFunctionInfo;
+	Molecule **pMolecules;
 
+	int dimX;
+	int *atom_list;
+	int *nFunc;
 	double *outputX;
 	double *outputEnergy;
 
@@ -26,6 +31,7 @@ struct SymFunction {
 	void OutputToNetwork(const bool IfEnergy = true);
 	void SymFuncOpt();
 	void SaveFuncInfo(double Err = 0);
+	void CalOutput();
 	void CalSymFunction();
 	void RunPES();
 };

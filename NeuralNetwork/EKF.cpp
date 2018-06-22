@@ -216,7 +216,7 @@ void EKF::FittingControl(const int & iFit)
 		cout << "Epoch" << iEpoch + 1 << endl;
 #endif // OUTPUT_TO_SCREEN
 
-		for (size_t iBatch = 0; iBatch < pInfo->nBatch; ++iBatch) {
+		for (long iBatch = 0; iBatch < pInfo->nBatch; ++iBatch) {
 
 			lambda = lambda0 * lambda + (1 - lambda0);
 			

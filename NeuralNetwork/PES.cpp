@@ -86,7 +86,7 @@ void PES::CalEnergy()
 	FileName = parameter.output_folder + parameter.fPES;
 	Eout.open(FileName.c_str(), ofstream::out);
 
-	for (size_t iSample = 0; iSample < parameter.nSample; ++iSample) {
+	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
 		Eout << setprecision(16) << Energy(iSample) << endl;
 	}
 

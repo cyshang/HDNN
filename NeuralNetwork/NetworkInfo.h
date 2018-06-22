@@ -13,10 +13,10 @@ struct NetworkInfo {
 	std::vector<std::vector<int> > nNeuron;	//number of neurons in each layer
 
 	double train_ratio;
-	size_t tSample;
-	size_t vSample;
-	size_t batch;
-	size_t nBatch;
+	long tSample;
+	long vSample;
+	long batch;
+	long nBatch;
 	bool IfLoadBatch;
 
 	int nFitting;

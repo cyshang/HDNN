@@ -51,7 +51,7 @@ void NeuralNetwork::ConstructNetwork()
 	targetEnergy.resize(parameter.nSample);
 	//---------Init RandomList
 	RandomList.resize(parameter.nSample);
-	for (size_t i = 0; i < parameter.nSample; ++i)
+	for (long i = 0; i < parameter.nSample; ++i)
 		RandomList[i] = i;
 	
 	if (parameter.run_mode == RUN_PES) {
@@ -93,7 +93,7 @@ void NeuralNetwork::DataInput()
 	FileName = parameter.input_folder + parameter.fNetworkData;
 	ifstream DataIn(FileName.c_str(), ifstream::in);
 
-	size_t iSample;
+	long iSample;
 	int dim;	
 
 	for (iSample = 0; iSample < parameter.nSample; ++iSample) {
@@ -112,7 +112,7 @@ void NeuralNetwork::DataInput()
 
 void NeuralNetwork::ShuffleData()
 {
-	for (size_t i = 0; i < parameter.nSample; ++i) {
+	for (long i = 0; i < parameter.nSample; ++i) {
 		inputX.col(i) = rawX.col(RandomList[i]);
 		targetEnergy.col(i) = rawEnergy.col(RandomList[i]);
 	}
@@ -153,7 +153,7 @@ void NeuralNetwork::SaveRandList(const int & iFit)
 
 	rout << "Fit" << iFit + 1 << endl;
 	 
-	for (size_t iSample = 0; iSample < parameter.nSample; ++iSample) {
+	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
 		rout << RandomList[iSample] << " ";			
 	}
 	rout << endl;
@@ -182,7 +182,7 @@ bool NeuralNetwork::LoadRandList(const int & iFit)
 		getVar.str(line);
 		getVar >> var;
 		if (var == key.str()) {
-			for (size_t i = 0; i < parameter.nSample; ++i) {
+			for (long i = 0; i < parameter.nSample; ++i) {
 				rin >> RandomList[i];
 			}
 			load_good = true;
@@ -198,7 +198,7 @@ void NeuralNetwork::ShuffleTrainData()
 {
 	std::random_shuffle(RandomList.begin(), RandomList.begin() + networkinfo.tSample);
 
-	for (size_t i = 0; i < networkinfo.tSample; ++i) {
+	for (long i = 0; i < networkinfo.tSample; ++i) {
 		inputX.col(i) = rawX.col(RandomList[i]);
 		targetEnergy.col(i) = rawEnergy.col(RandomList[i]);
 	}

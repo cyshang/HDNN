@@ -41,7 +41,7 @@ struct Parameter {
 	int random_seed;
 	void get_random_seed(std::istream & in) { in >> random_seed; }
 
-	size_t nSample; //Number of Samples in Data
+	long nSample; //Number of Samples in Data
 	bool IfLoadSample;
 	void get_nSample(std::istream & in) { in >> nSample; IfLoadSample = true; }	
 

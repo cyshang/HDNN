@@ -10,7 +10,6 @@ struct SymFunction;
 struct Molecule {
 	
 	static const SymFunction *pSymFunc;
-	static int dimX;
 	double energy;
 	std::vector<Atom> atoms;
 	

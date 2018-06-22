@@ -136,7 +136,7 @@ bool NetworkInfo::InitParameter()
 		else {
 			if (!IfLoadBatch) throw "batch";
 
-			tSample = static_cast<size_t> (parameter.nSample * train_ratio);
+			tSample = static_cast<long> (parameter.nSample * train_ratio);
 			if (optimizer == "LMBP") {
 				batch = tSample;
 				nBatch = 1;
