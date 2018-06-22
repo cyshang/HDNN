@@ -18,8 +18,8 @@ Molecule::Molecule()
 	:atoms(parameter.nAtom, Atom(this)), energy(0),
 	atom_distance(NULL), atom_cos0(NULL), G3_R2_sum(NULL), G4_R2_sum(NULL), G2_cutoff(NULL), G3_cutoff(NULL), G4_cutoff(NULL)
 {
-	int length_radial = parameter.nAtom * (parameter.nAtom - 1);
-	int length_angular = parameter.nAtom * ((parameter.nAtom - 1) * (parameter.nAtom - 2) / 2);
+	int length_radial = parameter.nAtom * parameter.nAtom;
+	int length_angular = parameter.nAtom * ((parameter.nAtom * (parameter.nAtom - 1)) / 2);
 
 	atom_distance = new double[length_radial];
 	atom_cos0 = new double[length_angular];
@@ -65,14 +65,21 @@ void Molecule::GetInput(istream & Input) {
 }
 
 void Molecule::CalMidValue() {
-	int iAtom, jAtom;
-	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom)
+	int iAtom, jAtom, kAtom;
+	VectorXd Rij(3);
+
+	for (iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		for (jAtom = 0; jAtom < parameter.nAtom; ++jAtom) {
-			if (iAtom == jAtom) continue;
-			adjAtoms[iAtom][jAtom].element = atoms[jAtom].element;
-			adjAtoms[iAtom][jAtom].Rij = atoms[jAtom].R - atoms[iAtom].R;
-			adjAtoms[iAtom][jAtom].distance = adjAtoms[iAtom][jAtom].Rij.norm();
+			if (iAtom == jAtom)
+				atom_distance[iAtom * parameter.nAtom + jAtom] = 0;
+			else {
+				Rij = atoms[jAtom].R - atoms[iAtom].R;
+				atom_distance[iAtom * parameter.nAtom + jAtom] = Rij.norm();
+			}
 		}
+	}
+
+
 }
 
 void Molecule::CalOutput() {
