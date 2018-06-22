@@ -337,19 +337,37 @@ void SymFunction::CalOutput()
 		int iRow = 0;
 		int nAtom = parameter.nAtom;
 		for (int iAtom = 0; iAtom < nAtom; ++iAtom) {
+			int jAtom, kAtom;
+
 			for (int iFunc = 0; iFunc < nFunc[iAtom]; ++iFunc) {
 				
-				if (pFuncType[iRow]->sym_func == 1) {
+				if (pFuncType[iRow]->sym_func == 1 && pFuncType[iRow]->cutoff_func == 1) {
+					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
+
+					}
+					outputX[iSample * dimX + iRow] = 0;
 
 				}
-				else if (pFuncType[iRow]->sym_func == 2) {
-
+				else if (pFuncType[iRow]->sym_func == 2 && pFuncType[iRow]->cutoff_func == 1) {
+					outputX[iSample * dimX + iRow] = 0;
 				}
-				else if (pFuncType[iRow]->sym_func == 3) {
-
+				else if (pFuncType[iRow]->sym_func == 1 && pFuncType[iRow]->cutoff_func == 0) {
+					outputX[iSample * dimX + iRow] = 0;
+				}
+				else if (pFuncType[iRow]->sym_func == 2 && pFuncType[iRow]->cutoff_func == 0) {
+					outputX[iSample * dimX + iRow] = 0;
+				}
+				else if (pFuncType[iRow]->sym_func == 3 && pFuncType[iRow]->cutoff_func == 1) {
+					outputX[iSample * dimX + iRow] = 0;
+				}
+				else if (pFuncType[iRow]->sym_func == 3 && pFuncType[iRow]->cutoff_func == 0) {
+					outputX[iSample * dimX + iRow] = 0;
+				}
+				else if (pFuncType[iRow]->sym_func == 0 && pFuncType[iRow]->cutoff_func == 0) {
+					outputX[iSample * dimX + iRow] = 0;
 				}
 				else {
-
+					outputX[iSample * dimX + iRow] = 0;
 				}
 				//---
 				++iRow;
