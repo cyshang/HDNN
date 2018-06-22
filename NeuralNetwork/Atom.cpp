@@ -14,10 +14,8 @@ using std::cout;
 using std::setw;
 using std::left;
 
-Atom::CUTOFF_FUNC Atom::CutoffFunc[2] = { &Atom::Cutoff1, &Atom::Cutoff2 };
-Atom::SYM_FUNC Atom::SymFunc[4] = { &Atom::G1, &Atom::G2, &Atom::G3, &Atom::G4 };
 
-Atom::Atom(const Molecule *_p) :pMolecule(_p), R(3) {}
+Atom::Atom(const Molecule *_p) :R(3) {}
 
 
 void Atom::GetInput(istream & Input) 
@@ -25,14 +23,6 @@ void Atom::GetInput(istream & Input)
 	string elementStr;
 	Input >> elementStr >> R(0) >> R(1) >> R(2);
 	Input.ignore(1024, '\n');
-}
-
-void Atom::CalOutput() 
-{
-
-	for (int iFunc = 0; iFunc < nFunc; ++iFunc) {
-		outputX[iFunc] = (this->*SymFunc[pFunc->symFunc[iFunc].sym_func])(pFunc->symFunc[iFunc]);
-	}
 }
 
 double Atom::Cutoff1(double distance, double Rc) 

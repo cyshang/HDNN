@@ -12,7 +12,6 @@
 struct FunctionInfo {
 	int nFunc;
 	int element;
-	int cutoff;
 	FuncType *funcType;
 
 	FunctionInfo(const int &_element);
