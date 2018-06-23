@@ -325,6 +325,7 @@ void SymFunction::SaveFuncInfo(double Err)
 
 void SymFunction::CalOutput()
 {
+
 	long iSample;
 	long nSample = parameter.nSample;
 	for (iSample = 0; iSample < nSample; ++iSample) {
@@ -336,6 +337,8 @@ void SymFunction::CalOutput()
 
 		int iRow = 0;
 		int nAtom = parameter.nAtom;
+		int CnAtom2 = (nAtom * (nAtom - 1)) >> 1;
+
 		for (int iAtom = 0; iAtom < nAtom; ++iAtom) {
 			int jAtom, kAtom;
 			/*
@@ -345,30 +348,53 @@ void SymFunction::CalOutput()
 #	G4: {Rc, lambda, eta, xi}
 			*/
 			for (int iFunc = 0; iFunc < nFunc[iAtom]; ++iFunc) {
-				
-				if (pFuncType[iRow]->sym_func == 1 && pFuncType[iRow]->cutoff_func == 1) {
-					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
-						 
-					}
-					outputX[iSample * dimX + iRow] = 0;
 
+				double *cutoff = pMolecules[iSample]->cutoff_func[atom_list[iAtom]][iFunc];
+				outputX[iSample * dimX + iRow] = 0;
+
+				if (pFuncType[iRow]->sym_func == 1) {	
+					
+					int element1 = pFuncType[iRow]->elements[0];
+					double eta = pFuncType[iRow]->FuncParameter[2];					
+					double Rs = pFuncType[iRow]->FuncParameter[1];
+					double Rij_Rs;
+
+					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
+						if (jAtom == iAtom || atom_list[jAtom] != element1)
+							continue;
+						Rij_Rs = distance[iAtom * nAtom + jAtom] - Rs;
+						outputX[iSample * dimX + iRow] += std::exp(-1 * eta * Rij_Rs * Rij_Rs) * cutoff[iAtom * nAtom + jAtom];
+					}					
 				}
-				else if (pFuncType[iRow]->sym_func == 2 && pFuncType[iRow]->cutoff_func == 1) {
-					outputX[iSample * dimX + iRow] = 0;
-				}
-				else if (pFuncType[iRow]->sym_func == 1 && pFuncType[iRow]->cutoff_func == 0) {
-					outputX[iSample * dimX + iRow] = 0;
-				}
-				else if (pFuncType[iRow]->sym_func == 2 && pFuncType[iRow]->cutoff_func == 0) {
-					outputX[iSample * dimX + iRow] = 0;
-				}
-				else if (pFuncType[iRow]->sym_func == 3 && pFuncType[iRow]->cutoff_func == 1) {
-					outputX[iSample * dimX + iRow] = 0;
-				}
-				else if (pFuncType[iRow]->sym_func == 3 && pFuncType[iRow]->cutoff_func == 0) {
-					outputX[iSample * dimX + iRow] = 0;
-				}
-				else if (pFuncType[iRow]->sym_func == 0 && pFuncType[iRow]->cutoff_func == 0) {
+				else if (pFuncType[iRow]->sym_func == 2) {
+
+					bool Ifcontinue;
+					int element1 = pFuncType[iRow]->elements[0], element2 = pFuncType[iRow]->elements[1];
+					double lambda = pFuncType[iRow]->FuncParameter[1];
+					double eta = pFuncType[iRow]->FuncParameter[2];
+					double xi = pFuncType[iRow]->FuncParameter[3];
+
+					int nPass = 0;
+					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
+						for (kAtom = jAtom + 1; kAtom < nAtom; ++kAtom) {
+
+							if (iAtom == jAtom || iAtom == kAtom) Ifcontinue = true;
+							else if (atom_list[jAtom] == element1 && atom_list[kAtom] == element2 || atom_list[jAtom] == element2 && atom_list[kAtom] == element1)
+								Ifcontinue = false;
+							else
+								Ifcontinue = true;
+
+							if (Ifcontinue) continue;
+							
+							outputX[iSample * dimX + iRow] += std::pow(1 + lambda * cos0[iAtom * CnAtom2 + nPass], xi) * std::exp(-1 * eta * G3_R2_sum[iAtom * CnAtom2 + nPass]) * cutoff[iAtom * nAtom + jAtom] * cutoff[iAtom * nAtom + kAtom] * cutoff[jAtom * nAtom + kAtom];
+							//------------------
+							++nPass;
+						}
+					}
+					outputX[iSample * dimX + iRow] *= std::pow(2, 1 - xi);
+				}			
+				else if (pFuncType[iRow]->sym_func == 3) {
+
 					outputX[iSample * dimX + iRow] = 0;
 				}
 				else {
