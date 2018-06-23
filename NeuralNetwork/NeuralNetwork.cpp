@@ -50,7 +50,9 @@ void NeuralNetwork::ConstructNetwork()
 //	rawX.resize(dimX, parameter.nSample);
 	inputX.resize(dimX, parameter.nSample);
 	//----------Init rawEnergy & targetEnergy
-	rawEnergy.resize(parameter.nSample);
+	arrayEnergy = new double[parameter.nSample];
+	new (&rawEnergy) Map<RowVectorXd>(arrayEnergy, parameter.nSample);
+	//rawEnergy.resize(parameter.nSample);
 	targetEnergy.resize(parameter.nSample);
 	//---------Init RandomList
 	RandomList.resize(parameter.nSample);
@@ -99,12 +101,13 @@ void NeuralNetwork::DataInput()
 	long iSample;
 	int dim;	
 
+	long pos = 0;
 	for (iSample = 0; iSample < parameter.nSample; ++iSample) {
 		for (dim = 0; dim < dimX; ++dim) {
-
-			DataIn >> rawX(dim, iSample);
+			DataIn >> arrayX[pos];
+			++pos;
 		}
-		DataIn >> rawEnergy(iSample);		
+		DataIn >> arrayEnergy[iSample];		
 	}
 	
 	DataIn.close();
