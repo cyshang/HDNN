@@ -18,7 +18,7 @@ using std::left;
 using namespace Eigen;
 
 SymFunction::SymFunction()
-	:pNetwork(NULL), pMCsetting(NULL), pFunctionInfo(NULL), pMolecules(NULL), pFuncType(NULL),
+	:pNetwork(NULL), pMCsetting(NULL), pFunctionInfo(NULL), pMolecules(NULL),
 	atom_list(NULL), nFunc(NULL), outputX(NULL), outputEnergy(NULL)
 {
 
@@ -74,7 +74,6 @@ SymFunction::~SymFunction()
 		delete pMCsetting;
 	}
 	
-	delete[] pFuncType;
 	delete[] atom_list;
 	delete[] nFunc;
 	delete[] outputX;
@@ -128,14 +127,7 @@ void SymFunction::Construct()
 		nFunc[iAtom] = pFunctionInfo[atom_list[iAtom]]->nFunc;
 	}
 
-	pFuncType = new FuncType*[dimX];
-	int nowFunc = 0;
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		for (int iFunc = 0; iFunc < nFunc[iAtom]; ++iFunc) {
-			pFuncType[nowFunc + iFunc] = pFunctionInfo[atom_list[iAtom]]->funcType + iFunc;
-		}
-		nowFunc += nFunc[iAtom];
-	}
+
 
 	outputX = new double[parameter.nSample * dimX];
 	outputEnergy = new double[parameter.nSample];
@@ -328,6 +320,9 @@ void SymFunction::CalOutput()
 
 	long iSample;
 	long nSample = parameter.nSample;
+	int nAtom = parameter.nAtom;
+	int CnAtom2 = (nAtom * (nAtom - 1)) >> 1;
+
 	for (iSample = 0; iSample < nSample; ++iSample) {
 		
 		const double *distance = pMolecules[iSample]->atom_distance;
@@ -337,8 +332,6 @@ void SymFunction::CalOutput()
 
 		long skipCols = iSample * dimX;
 		long iRow = 0;
-		int nAtom = parameter.nAtom;
-		int CnAtom2 = (nAtom * (nAtom - 1)) >> 1;
 
 		for (int iAtom = 0; iAtom < nAtom; ++iAtom) {
 			int jAtom, kAtom;
@@ -352,14 +345,16 @@ void SymFunction::CalOutput()
 			*/
 			for (int iFunc = 0; iFunc < nFunc[iAtom]; ++iFunc) {
 
+				FuncType *pFuncType = pFunctionInfo[atom_list[iAtom]]->funcType + iFunc;
+
 				double *cutoff = pMolecules[iSample]->cutoff_func[atom_list[iAtom]][iFunc];
 				outputX[skipCols + iRow] = 0;
 
-				if (pFuncType[iRow]->sym_func == 1) {	
+				if (pFuncType->sym_func == 1) {	
 					
-					int element1 = pFuncType[iRow]->elements[0];
-					double eta = pFuncType[iRow]->FuncParameter[2];					
-					double Rs = pFuncType[iRow]->FuncParameter[1];
+					int element1 = pFuncType->elements[0];
+					double eta = pFuncType->FuncParameter[2];					
+					double Rs = pFuncType->FuncParameter[1];
 					double Rij_Rs;
 
 					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
@@ -369,13 +364,13 @@ void SymFunction::CalOutput()
 						}							
 					}					
 				}
-				else if (pFuncType[iRow]->sym_func == 2) {
+				else if (pFuncType->sym_func == 2) {
 
 					bool Ifcontinue;
-					int element1 = pFuncType[iRow]->elements[0], element2 = pFuncType[iRow]->elements[1];
-					double lambda = pFuncType[iRow]->FuncParameter[1];
-					double eta = pFuncType[iRow]->FuncParameter[2];
-					double xi = pFuncType[iRow]->FuncParameter[3];
+					int element1 = pFuncType->elements[0], element2 = pFuncType->elements[1];
+					double lambda = pFuncType->FuncParameter[1];
+					double eta = pFuncType->FuncParameter[2];
+					double xi = pFuncType->FuncParameter[3];
 
 					int nPass = 0;
 					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
@@ -389,13 +384,13 @@ void SymFunction::CalOutput()
 					}
 					outputX[skipCols + iRow] *= std::pow(2, 1 - xi);
 				}			
-				else if (pFuncType[iRow]->sym_func == 3) {
+				else if (pFuncType->sym_func == 3) {
 
 					bool Ifcompute;
-					int element1 = pFuncType[iRow]->elements[0], element2 = pFuncType[iRow]->elements[1];
-					double lambda = pFuncType[iRow]->FuncParameter[1];
-					double eta = pFuncType[iRow]->FuncParameter[2];
-					double xi = pFuncType[iRow]->FuncParameter[3];
+					int element1 = pFuncType->elements[0], element2 = pFuncType->elements[1];
+					double lambda = pFuncType->FuncParameter[1];
+					double eta = pFuncType->FuncParameter[2];
+					double xi = pFuncType->FuncParameter[3];
 
 					int nPass = 0;
 					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
@@ -410,7 +405,7 @@ void SymFunction::CalOutput()
 					outputX[skipCols + iRow] *= std::pow(2, 1 - xi);
 				}
 				else {
-					int element1 = pFuncType[iRow]->elements[0];
+					int element1 = pFuncType->elements[0];
 
 					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
 						if (jAtom != iAtom && atom_list[jAtom] == element1)

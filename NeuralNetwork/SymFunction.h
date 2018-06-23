@@ -12,7 +12,6 @@ struct FuncType;
 struct SymFunction {
 	NeuralNetwork *pNetwork;
 	MonteCarloSetting *pMCsetting;	
-	FuncType **pFuncType;
 
 	FunctionInfo **pFunctionInfo;
 	Molecule **pMolecules;
