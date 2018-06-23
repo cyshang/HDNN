@@ -383,7 +383,6 @@ void SymFunction::CalOutput()
 				}			
 				else if (pFuncType->sym_func == 3) {
 
-					bool Ifcompute;
 					int element1 = pFuncType->elements[0], element2 = pFuncType->elements[1];
 					double lambda = pFuncType->FuncParameter[1];
 					double eta = pFuncType->FuncParameter[2];
