@@ -342,6 +342,8 @@ void SymFunction::CalOutput()
 
 		for (int iAtom = 0; iAtom < nAtom; ++iAtom) {
 			int jAtom, kAtom;
+			int skipAtoms1 = iAtom * nAtom;
+			int skipAtoms2 = iAtom * CnAtom2;
 			/*
 #	G1: {Rc}
 #	G2: {Rc, Rs, eta}
@@ -361,10 +363,10 @@ void SymFunction::CalOutput()
 					double Rij_Rs;
 
 					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
-						if (jAtom == iAtom || atom_list[jAtom] != element1)
-							continue;
-						Rij_Rs = distance[iAtom * nAtom + jAtom] - Rs;
-						outputX[skipCols + iRow] += std::exp(-1 * eta * Rij_Rs * Rij_Rs) * cutoff[iAtom * nAtom + jAtom];
+						if (jAtom != iAtom && atom_list[jAtom] == element1) {
+							Rij_Rs = distance[skipAtoms1 + jAtom] - Rs;
+							outputX[skipCols + iRow] += std::exp(-1 * eta * Rij_Rs * Rij_Rs) * cutoff[skipAtoms1 + jAtom];
+						}							
 					}					
 				}
 				else if (pFuncType[iRow]->sym_func == 2) {
@@ -379,15 +381,8 @@ void SymFunction::CalOutput()
 					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
 						for (kAtom = jAtom + 1; kAtom < nAtom; ++kAtom) {
 
-							if (iAtom == jAtom || iAtom == kAtom) Ifcontinue = true;
-							else if (atom_list[jAtom] == element1 && atom_list[kAtom] == element2 || atom_list[jAtom] == element2 && atom_list[kAtom] == element1)
-								Ifcontinue = false;
-							else
-								Ifcontinue = true;
-
-							if (Ifcontinue) continue;
-							
-							outputX[skipCols + iRow] += std::pow(1 + lambda * cos0[iAtom * CnAtom2 + nPass], xi) * std::exp(-1 * eta * G3_R2_sum[iAtom * CnAtom2 + nPass]) * cutoff[iAtom * nAtom + jAtom] * cutoff[iAtom * nAtom + kAtom] * cutoff[jAtom * nAtom + kAtom];
+							if (iAtom != jAtom && iAtom != kAtom && (atom_list[jAtom] == element1 && atom_list[kAtom] == element2 || atom_list[jAtom] == element2 && atom_list[kAtom] == element1))
+								outputX[skipCols + iRow] += std::pow(1 + lambda * cos0[skipAtoms2 + nPass], xi) * std::exp(-1 * eta * G3_R2_sum[skipAtoms2 + nPass]) * cutoff[skipAtoms1 + jAtom] * cutoff[skipAtoms1 + kAtom] * cutoff[jAtom * nAtom + kAtom];
 							//------------------
 							++nPass;
 						}
@@ -407,7 +402,7 @@ void SymFunction::CalOutput()
 						for (kAtom = jAtom + 1; kAtom < nAtom; ++kAtom) {
 
 							if (iAtom != jAtom && iAtom != kAtom && (atom_list[jAtom] == element1 && atom_list[kAtom] == element2 || atom_list[jAtom] == element2 && atom_list[kAtom] == element1))
-								outputX[skipCols + iRow] += std::pow(1 + lambda * cos0[iAtom * CnAtom2 + nPass], xi) * std::exp(-1 * eta * G4_R2_sum[iAtom * CnAtom2 + nPass]) * cutoff[iAtom * nAtom + jAtom] * cutoff[iAtom * nAtom + kAtom];
+								outputX[skipCols + iRow] += std::pow(1 + lambda * cos0[skipAtoms2 + nPass], xi) * std::exp(-1 * eta * G4_R2_sum[skipAtoms2 + nPass]) * cutoff[skipAtoms1 + jAtom] * cutoff[skipAtoms1 + kAtom];
 							//------------------
 							++nPass;
 						}
@@ -415,7 +410,12 @@ void SymFunction::CalOutput()
 					outputX[skipCols + iRow] *= std::pow(2, 1 - xi);
 				}
 				else {
-					outputX[skipCols + iRow] = 0;
+					int element1 = pFuncType[iRow]->elements[0];
+
+					for (jAtom = 0; jAtom < nAtom; ++jAtom) {
+						if (jAtom != iAtom && atom_list[jAtom] == element1)
+							outputX[skipCols + iRow] += cutoff[skipAtoms1 + jAtom];
+					}
 				}
 				//---
 				++iRow;
