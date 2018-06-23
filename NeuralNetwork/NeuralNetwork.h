@@ -22,13 +22,15 @@ struct NeuralNetwork
 
 	int dimX;
 
-	Eigen::MatrixXd rawX;
+	double *arrayX;
+	Eigen::Map<Eigen::MatrixXd> rawX;
 	Eigen::MatrixXd inputX;
 	Eigen::VectorXd maxX;
 	Eigen::VectorXd minX;
 	Eigen::VectorXd avgX;
 
-	Eigen::RowVectorXd rawEnergy;
+	double *arrayEnergy;
+	Eigen::Map<Eigen::RowVectorXd> rawEnergy;
 	Eigen::RowVectorXd targetEnergy;
 	double maxEnergy;
 	double minEnergy;

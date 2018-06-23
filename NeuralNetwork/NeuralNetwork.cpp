@@ -13,8 +13,9 @@ using std::ifstream;
 using std::ofstream;
 using std::string;
 using std::setprecision;
+using namespace Eigen;
 
-NeuralNetwork::NeuralNetwork() :networkinfo(), optimizer(NULL), pes(NULL) {}
+NeuralNetwork::NeuralNetwork() :networkinfo(), optimizer(NULL), pes(NULL), rawX(NULL), rawEnergy(NULL) {}
 
 NeuralNetwork::~NeuralNetwork()
 {
@@ -44,7 +45,9 @@ void NeuralNetwork::ConstructNetwork()
 		dimX += networkinfo.nNet[iGroup] * networkinfo.nNeuron[iGroup][0];
 	}
 	//----------Init rawX & inputX
-	rawX.resize(dimX, parameter.nSample);
+	arrayX = new double[dimX * parameter.nSample];
+	new (&rawX) Map<MatrixXd>(arrayX, dimX, parameter.nSample);	
+//	rawX.resize(dimX, parameter.nSample);
 	inputX.resize(dimX, parameter.nSample);
 	//----------Init rawEnergy & targetEnergy
 	rawEnergy.resize(parameter.nSample);

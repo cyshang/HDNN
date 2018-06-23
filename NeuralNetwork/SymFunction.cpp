@@ -169,7 +169,7 @@ bool SymFunction::GetData()
 
 void SymFunction::OutputToNetwork(const bool IfEnergy)
 {
-
+	pNetwork->inputX = 
 }
 
 void SymFunction::SymFuncOpt()
