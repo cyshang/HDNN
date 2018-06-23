@@ -15,7 +15,7 @@ using std::string;
 using std::setprecision;
 using namespace Eigen;
 
-NeuralNetwork::NeuralNetwork() :networkinfo(), optimizer(NULL), pes(NULL), rawX(NULL), rawEnergy(NULL) {}
+NeuralNetwork::NeuralNetwork() :networkinfo(), optimizer(NULL), pes(NULL), rawX(NULL, 0, 0), rawEnergy(NULL, 0, 0) {}
 
 NeuralNetwork::~NeuralNetwork()
 {
