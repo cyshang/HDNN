@@ -8,7 +8,17 @@ using std::string;
 
 const MonteCarloSetting * FuncType::pMCsetting = NULL;
 
-FuncType::FuncType() {}
+FuncType::FuncType()
+{
+	for (int i = 0; i < 4; ++i) {
+		FuncParameter[i] = 0;
+		parameters_copy[i] = 0;
+	}
+	cutoff_func = 0;
+	sym_func = 0;
+	elements[0] = 0;
+	elements[1] = 0;
+}
 
 void FuncType::GetFuncType(const std::string & str)
 {
@@ -16,14 +26,16 @@ void FuncType::GetFuncType(const std::string & str)
 	string elementStr, cutoffStr, symStr;
 
 	sin >> cutoffStr >> symStr;
-
+	// Init cutoff_func
 	if (cutoffStr == "C1") {
 		cutoff_func = 0;
 	}
 	else if (cutoffStr == "C2") {
 		cutoff_func = 1;
 	}
+	//--------------------------------
 
+	// Init sym_func
 	if (symStr == "G1") {
 		sym_func = 0;
 	}
@@ -36,13 +48,10 @@ void FuncType::GetFuncType(const std::string & str)
 	else if (symStr == "G4") {
 		sym_func = 3;
 	}
+	//---------------------------------
 
 	switch (sym_func) {
 	case 0: {
-		elements.resize(1);
-		FuncParameter.resize(1);
-		parameters_copy.resize(1);
-
 		sin >> elementStr;
 		elements[0] = parameter.element_to_num[elementStr];		
 
@@ -50,43 +59,31 @@ void FuncType::GetFuncType(const std::string & str)
 		break;
 	}
 	case 1: {
-		elements.resize(1);
-		FuncParameter.resize(3);
-		parameters_copy.resize(3);
 
 		sin >> elementStr;
 		elements[0] = parameter.element_to_num[elementStr];
 
-		for (int i = 0; i < 3; ++i)
-			sin >> FuncParameter[i];
+		sin >> FuncParameter[0] >> FuncParameter[1] >> FuncParameter[2];		
 		break;
 	}
-	case 2: {
-		elements.resize(2);
-		FuncParameter.resize(4);
-		parameters_copy.resize(4);
+	case 2: {		
 
 		for (int i = 0; i < 2; ++i) {
 			sin >> elementStr;
 			elements[i] = parameter.element_to_num[elementStr];
 		}
 		
-		for (int i = 0; i < 4; ++i)
-			sin >> FuncParameter[i];
+		sin >> FuncParameter[0] >> FuncParameter[1] >> FuncParameter[2] >> FuncParameter[3];
 		break;
 	}
 	case 3: {
-		elements.resize(2);
-		FuncParameter.resize(4);
-		parameters_copy.resize(4);
 
 		for (int i = 0; i < 2; ++i) {
 			sin >> elementStr;
 			elements[i] = parameter.element_to_num[elementStr];
 		}
 
-		for (int i = 0; i < 4; ++i)
-			sin >> FuncParameter[i];
+		sin >> FuncParameter[0] >> FuncParameter[1] >> FuncParameter[2] >> FuncParameter[3];
 		break;
 	}
 	}
@@ -94,14 +91,14 @@ void FuncType::GetFuncType(const std::string & str)
 
 void FuncType::Backup()
 {
-	for (size_t i = 0; i < FuncParameter.size(); ++i) {
+	for (int i = 0; i < 4; ++i) {
 		parameters_copy[i] = FuncParameter[i];
 	}
 }
 
 void FuncType::Restore()
 {
-	for (size_t i = 0; i < FuncParameter.size(); ++i) {
+	for (int i = 0; i < 4; ++i) {
 		FuncParameter[i] = parameters_copy[i];
 	}
 }
@@ -109,6 +106,7 @@ void FuncType::Restore()
 string FuncType::OutputFuncType()
 {	
 	ostringstream sout;
+	int element_size, parameter_size;
 
 	switch (cutoff_func)
 	{
@@ -121,20 +119,20 @@ string FuncType::OutputFuncType()
 
 	switch (sym_func)
 	{
-	case 0:	sout << "G1"; break;
-	case 1:	sout << "G2"; break;
-	case 2:	sout << "G3"; break;
-	case 3:	sout << "G4"; break;
+	case 0:	sout << "G1"; element_size = 1; parameter_size = 1; break;
+	case 1:	sout << "G2"; element_size = 1; parameter_size = 3; break;
+	case 2:	sout << "G3"; element_size = 2; parameter_size = 4; break;
+	case 3:	sout << "G4"; element_size = 2; parameter_size = 4; break;
 	default:
 		break;
 	}
 	sout << "\t";
 
-	for (size_t i = 0; i < elements.size(); ++i) {
+	for (int i = 0; i < element_size; ++i) {
 		sout << parameter.num_to_element[elements[i]] << "\t";		
 	}
 
-	for (size_t i = 0; i < FuncParameter.size(); ++i) {
+	for (int i = 0; i < parameter_size; ++i) {
 		sout << FuncParameter[i] << "\t";
 	}	
 

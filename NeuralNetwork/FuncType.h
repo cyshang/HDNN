@@ -16,7 +16,6 @@ struct FuncType {
 	int elements[2]; 
 
 	FuncType();
-	~FuncType();
 	void GetFuncType(const std::string & str);
 	void Backup();
 	void Restore();
