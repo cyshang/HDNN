@@ -27,7 +27,7 @@ struct SymFunction {
 	void LinkToNetwork(NeuralNetwork * _pNetwork);
 	void Construct();
 	bool GetData();
-	void OutputToNetwork(const bool IfEnergy = true);
+	
 	void SymFuncOpt();
 	void SaveFuncInfo(double Err = 0);
 	void CalOutput();

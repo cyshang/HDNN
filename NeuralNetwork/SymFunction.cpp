@@ -168,10 +168,7 @@ bool SymFunction::GetData()
 	return false;
 }
 
-void SymFunction::OutputToNetwork(const bool IfEnergy)
-{
-	pNetwork->inputX = 
-}
+
 
 void SymFunction::SymFuncOpt()
 {
@@ -194,12 +191,7 @@ void SymFunction::SymFuncOpt()
 	int nAccept = 0;
 	bool IfLastAccept = true;
 
-	long iSample;
-	for (iSample = 0; iSample < parameter.nSample; ++iSample) {
-		pMolecules[iSample]->CalOutput();
-	}
-	
-	OutputToNetwork(true);
+	CalOutput();	
 	pNetwork->ScaleX();
 	pNetwork->ScaleEnergy();
 	lastErr = pNetwork->TrainNetwork();
@@ -239,12 +231,7 @@ void SymFunction::SymFuncOpt()
 			pFunctionInfo[iElement]->PerturbFunc();
 		}
 
-		for (iSample = 0; iSample < parameter.nSample; ++iSample) {
-			//	Calculate SymFunctions first!
-			pMolecules[iSample]->CalOutput();
-		}
-		
-		OutputToNetwork(false);
+		CalOutput();		
 		pNetwork->ScaleX();
 
 		Err = pNetwork->TrainNetwork();
@@ -424,14 +411,14 @@ void SymFunction::CalSymFunction()
 	FileName = parameter.input_folder + parameter.fNetworkData;
 	fout.open(FileName.c_str(), ofstream::out);
 
+	CalOutput();
+
+	long pos = 0;
 	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
-#ifdef OUTPUT_TO_SCREEN
-		if (!(iSample % 10))
-			std::cout << "iSample " << iSample << endl;
-#endif
-		pMolecules[iSample]->CalOutput();
-		pMolecules[iSample]->Output(fout);
-		fout << std::endl;
+		for (int i = 0; i < dimX; ++i) {
+			fout << outputX[pos++] << " ";
+		}
+		fout << outputEnergy[iSample] << endl;
 	}
 
 	fout.close();
@@ -439,8 +426,5 @@ void SymFunction::CalSymFunction()
 
 void SymFunction::RunPES()
 {
-	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
-		pMolecules[iSample]->CalOutput();
-	}
-	OutputToNetwork(false);
+	CalOutput();
 }
