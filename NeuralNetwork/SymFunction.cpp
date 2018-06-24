@@ -158,6 +158,10 @@ bool SymFunction::GetData()
 		pMolecules[iSample]->GetInput(din);
 	}
 	din.close();
+
+	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
+		outputEnergy[iSample] = pMolecules[iSample]->energy;
+	}
 	//--------Data input complete
 
 	//--------Calculate AdjAtom matrix for every molecule

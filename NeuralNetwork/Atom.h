@@ -14,7 +14,6 @@ struct Atom {
 
 	Atom(const Molecule *_p);
 	void GetInput(std::istream & Input);
-	void OutputInfo();
 };
 
 #endif // !ATOM_H_

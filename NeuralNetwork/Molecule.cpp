@@ -155,10 +155,6 @@ void Molecule::OutputAngle(ofstream * pAout)
 
 void Molecule::OutputInfo()
 {
-	int i;
-	for (i = 0; i < parameter.nAtom; ++i) {
-		atoms[i].OutputInfo();
-		cout << endl;
-	}
+
 
 }
