@@ -15,7 +15,7 @@ using std::string;
 using std::setprecision;
 using namespace Eigen;
 
-NeuralNetwork::NeuralNetwork() :networkinfo(), optimizer(NULL), pes(NULL), rawX(NULL, 0, 0), rawEnergy(NULL, 0, 0) {}
+NeuralNetwork::NeuralNetwork() :networkinfo(), optimizer(NULL), pes(NULL), rawX(NULL, 0, 0), rawEnergy(NULL, 0, 0), arrayEnergy(NULL), arrayX(NULL) {}
 
 NeuralNetwork::~NeuralNetwork()
 {
@@ -23,6 +23,10 @@ NeuralNetwork::~NeuralNetwork()
 		delete optimizer;
 	if (pes)
 		delete pes;
+	if (arrayEnergy)
+		delete[] arrayEnergy;
+	if (arrayX)
+		delete[] arrayX;
 }
 
 void NeuralNetwork::ConstructNetwork()
@@ -45,13 +49,17 @@ void NeuralNetwork::ConstructNetwork()
 		dimX += networkinfo.nNet[iGroup] * networkinfo.nNeuron[iGroup][0];
 	}
 	//----------Init rawX & inputX
-	arrayX = new double[dimX * parameter.nSample];
-	new (&rawX) Map<MatrixXd>(arrayX, dimX, parameter.nSample);	
+	if (parameter.run_mode != SYMFUNC_OPT) {
+		arrayX = new double[dimX * parameter.nSample];
+		new (&rawX) Map<MatrixXd>(arrayX, dimX, parameter.nSample);
+	}
 //	rawX.resize(dimX, parameter.nSample);
 	inputX.resize(dimX, parameter.nSample);
 	//----------Init rawEnergy & targetEnergy
-	arrayEnergy = new double[parameter.nSample];
-	new (&rawEnergy) Map<RowVectorXd>(arrayEnergy, parameter.nSample);
+	if (parameter.run_mode != SYMFUNC_OPT) {
+		arrayEnergy = new double[parameter.nSample];
+		new (&rawEnergy) Map<RowVectorXd>(arrayEnergy, parameter.nSample);
+	}
 	//rawEnergy.resize(parameter.nSample);
 	targetEnergy.resize(parameter.nSample);
 	//---------Init RandomList

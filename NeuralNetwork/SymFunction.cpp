@@ -54,6 +54,9 @@ SymFunction::SymFunction()
 void SymFunction::LinkToNetwork(NeuralNetwork * _pNetwork)
 {
 	pNetwork = _pNetwork;
+	//new (&rawEnergy) Map<RowVectorXd>(arrayEnergy, parameter.nSample);
+	new (&(pNetwork->rawX)) Map<MatrixXd>(outputX, dimX, parameter.nSample);
+	new (&(pNetwork->rawEnergy)) Map<RowVectorXd>(outputEnergy, parameter.nSample);
 }
 
 SymFunction::~SymFunction()
@@ -126,8 +129,6 @@ void SymFunction::Construct()
 	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
 		nFunc[iAtom] = pFunctionInfo[atom_list[iAtom]]->nFunc;
 	}
-
-
 
 	outputX = new double[parameter.nSample * dimX];
 	outputEnergy = new double[parameter.nSample];
