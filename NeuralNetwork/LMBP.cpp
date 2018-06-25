@@ -225,8 +225,12 @@ void LMBP::BackPropagation()
 		pGroup[iGroup]->BackProp();
 	}
 
-	JtJ = Jac.transpose() * Jac;
+	JtJ = Jac.transpose().eval() * Jac;
 	JtErr = Jac.transpose() * tErr.transpose();
+#ifdef DEBUG_MODE
+	debug << JtJ << endl;
+#endif // DEBUG_MODE
+
 }
 
 void LMBP::UpdateWeight(const double & now_mu)
