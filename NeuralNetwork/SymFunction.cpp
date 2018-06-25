@@ -424,9 +424,10 @@ void SymFunction::CalSymFunction()
 	long pos = 0;
 	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
 		for (int i = 0; i < dimX; ++i) {
-			fout << outputX[pos++] << " ";
+			//Dataout << std::setprecision(16) << outputX[iFunc] << " ";
+			fout << std::setprecision(16) << outputX[pos++] << " ";
 		}
-		fout << outputEnergy[iSample] << endl;
+		fout << std::setprecision(16) << outputEnergy[iSample] << endl;
 	}
 
 	fout.close();
