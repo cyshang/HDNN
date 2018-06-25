@@ -9,7 +9,10 @@ using std::cout;
 
 FunctionInfo::FunctionInfo(const int &_element) :element(_element) {}
 
-FunctionInfo::~FunctionInfo() {}
+FunctionInfo::~FunctionInfo() 
+{
+	delete[] funcType;
+}
 
 void FunctionInfo::GetInfo(istream & getInfo, const int & _nFunc) 
 {
@@ -20,7 +23,7 @@ void FunctionInfo::GetInfo(istream & getInfo, const int & _nFunc)
 	int iFunc;
 	string inputStr;
 
-	funcType.resize(nFunc);
+	funcType = new FuncType[nFunc];
 
 	for (iFunc = 0; iFunc < nFunc; ++iFunc) {
 		std::getline(getInfo, inputStr);
