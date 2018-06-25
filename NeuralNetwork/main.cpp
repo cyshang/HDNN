@@ -64,7 +64,7 @@ int main(void)
 		}
 		else if (parameter.run_mode == SYMFUNC_OPT) {
 
-			pNetwork = new NeuralNetwork;
+			pNetwork = new NeuralNetwork;			
 			pSymFunc = new SymFunction;
 			pNetwork->ConstructNetwork();
 			pSymFunc->Construct();
