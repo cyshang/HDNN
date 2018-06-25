@@ -78,34 +78,31 @@ void Molecule::CalMidValue() {
 	//Calculate atom_distance matrix
 	for (iAtom = 0; iAtom < nAtom; ++iAtom) {
 		for (jAtom = 0; jAtom < nAtom; ++jAtom) {
-			if (iAtom == jAtom)
-				atom_distance[iAtom * nAtom + jAtom] = 0;
-			else {
-				Rij = atoms[jAtom].R - atoms[iAtom].R;
-				atom_distance[iAtom * nAtom + jAtom] = Rij.norm();
-			}
+
+			Rij = atoms[jAtom].R - atoms[iAtom].R;
+			atom_distance[iAtom * nAtom + jAtom] = Rij.norm();
 		}
 	}
 	
 	//Calculate atom_cos0, G3_R2_sum, G4_R2_sum
-	int nCol = (nAtom * (nAtom - 1)) / 2;
+	int CnAtom2 = (nAtom * (nAtom - 1)) >> 1;
 	for (iAtom = 0; iAtom < nAtom; ++iAtom) {
 		int nPass = 0;
 		for (jAtom = 0; jAtom < nAtom; ++jAtom) {
 			for (kAtom = jAtom + 1; kAtom < nAtom; ++kAtom) {
 				if (iAtom == jAtom || iAtom == kAtom) {
-					atom_cos0[iAtom * nCol + nPass] = 0;
-					G3_R2_sum[iAtom * nCol + nPass] = 0;
-					G4_R2_sum[iAtom * nCol + nPass] = 0;
+					atom_cos0[iAtom * CnAtom2 + nPass] = 0;
+					G3_R2_sum[iAtom * CnAtom2 + nPass] = 0;
+					G4_R2_sum[iAtom * CnAtom2 + nPass] = 0;
 				}
 				else {
 					Rij = atoms[jAtom].R - atoms[iAtom].R;
 					Rik = atoms[kAtom].R - atoms[iAtom].R;
 					Rjk = atoms[jAtom].R - atoms[kAtom].R;
 
-					atom_cos0[iAtom * nCol + nPass] = Rij.dot(Rik) / (Rij.norm() * Rik.norm());
-					G3_R2_sum[iAtom * nCol + nPass] = Rij.squaredNorm() + Rik.squaredNorm() + Rjk.squaredNorm();
-					G4_R2_sum[iAtom * nCol + nPass] = Rij.squaredNorm() + Rik.squaredNorm();
+					atom_cos0[iAtom * CnAtom2 + nPass] = Rij.dot(Rik) / (Rij.norm() * Rik.norm());
+					G3_R2_sum[iAtom * CnAtom2 + nPass] = Rij.squaredNorm() + Rik.squaredNorm() + Rjk.squaredNorm();
+					G4_R2_sum[iAtom * CnAtom2 + nPass] = Rij.squaredNorm() + Rik.squaredNorm();
 				}				
 				//------
 				++nPass;
@@ -121,7 +118,7 @@ void Molecule::CalMidValue() {
 		}
 	}
 
-	double relative_distance;
+	double R_ratio;
 	for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
 		for (int iFunc = 0; iFunc < nFunc[iElement]; ++iFunc) {
 			const FuncType *pFuncType = pSymFunc->pFunctionInfo[iElement]->funcType + iFunc;
@@ -131,12 +128,12 @@ void Molecule::CalMidValue() {
 						cutoff_func[iElement][iFunc][iAtom * nAtom + jAtom] = 0;
 					}
 					else {
-						relative_distance = atom_distance[iAtom * nAtom + jAtom] / pFuncType->FuncParameter[0];
+						R_ratio = atom_distance[iAtom * nAtom + jAtom] / pFuncType->FuncParameter[0];
 						if (pFuncType->cutoff_func == 0) {
-							cutoff_func[iElement][iFunc][iAtom * nAtom + jAtom] = (relative_distance > 1) ? 0 : (0.5 * (std::cos(PI * relative_distance) + 1));
+							cutoff_func[iElement][iFunc][iAtom * nAtom + jAtom] = (R_ratio > 1) ? 0 : (0.5 * (std::cos(PI * R_ratio) + 1));
 						}
 						else {
-							cutoff_func[iElement][iFunc][iAtom * nAtom + jAtom] = (relative_distance > 1) ? 0 : (std::tanh(1 - relative_distance) * std::tanh(1 - relative_distance) * std::tanh(1 - relative_distance));
+							cutoff_func[iElement][iFunc][iAtom * nAtom + jAtom] = (R_ratio > 1) ? 0 : (std::tanh(1 - R_ratio) * std::tanh(1 - R_ratio) * std::tanh(1 - R_ratio));
 						}
 					}
 				}
