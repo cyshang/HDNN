@@ -51,14 +51,6 @@ SymFunction::SymFunction()
 	}
 }
 
-void SymFunction::LinkToNetwork(NeuralNetwork * _pNetwork)
-{
-	pNetwork = _pNetwork;
-	//new (&rawEnergy) Map<RowVectorXd>(arrayEnergy, parameter.nSample);
-	new (&(pNetwork->rawX)) Map<MatrixXd>(outputX, dimX, parameter.nSample);
-	new (&(pNetwork->rawEnergy)) Map<RowVectorXd>(outputEnergy, parameter.nSample);
-}
-
 SymFunction::~SymFunction()
 {
 	
@@ -140,6 +132,14 @@ void SymFunction::Construct()
 
 }
 
+void SymFunction::LinkToNetwork(NeuralNetwork * _pNetwork)
+{
+	pNetwork = _pNetwork;
+	//new (&rawEnergy) Map<RowVectorXd>(arrayEnergy, parameter.nSample);
+	new (&(pNetwork->rawX)) Map<MatrixXd>(outputX, dimX, parameter.nSample);
+	new (&(pNetwork->rawEnergy)) Map<RowVectorXd>(outputEnergy, parameter.nSample);
+}
+
 bool SymFunction::GetData()
 {
 	//--------Data input part
@@ -173,7 +173,6 @@ bool SymFunction::GetData()
 	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
 		pMolecules[iSample]->CalMidValue();
 	}
-
 	return false;
 }
 
@@ -200,7 +199,7 @@ void SymFunction::SymFuncOpt()
 	int nAccept = 0;
 	bool IfLastAccept = true;
 
-	CalOutput();	
+	CalOutput();
 	pNetwork->ScaleX();
 	pNetwork->ScaleEnergy();
 	lastErr = pNetwork->TrainNetwork();
