@@ -12,7 +12,7 @@ struct Molecule {
 	static const SymFunction *pSymFunc;
 	double energy;
 	std::vector<Atom> atoms;
-	std::vector<int> nFunc;
+	static std::vector<int> nFunc;
 
 	double *atom_distance;
 	double *atom_cos0;

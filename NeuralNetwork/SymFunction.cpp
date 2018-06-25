@@ -115,6 +115,11 @@ void SymFunction::Construct()
 	}
 	fin.close();
 
+	Molecule::nFunc.resize(parameter.nElement);
+	for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
+		Molecule::nFunc[iElement] = pFunctionInfo[iElement]->nFunc;
+	}
+
 	if (parameter.run_mode == SYMFUNC_OPT) {
 		pMCsetting->GetSetting();
 	}

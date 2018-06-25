@@ -16,10 +16,11 @@ using std::left;
 using std::cout;
 
 const SymFunction * Molecule::pSymFunc = NULL;
+std::vector<int> Molecule::nFunc;
 
 Molecule::Molecule()
 	:atoms(parameter.nAtom, Atom(this)), energy(0),
-	atom_distance(NULL), atom_cos0(NULL), G3_R2_sum(NULL), G4_R2_sum(NULL)
+	atom_distance(NULL), atom_cos0(NULL), G3_R2_sum(NULL), G4_R2_sum(NULL), cutoff_func(NULL)
 {
 	int length_radial = parameter.nAtom * parameter.nAtom;
 	int length_angular = parameter.nAtom * ((parameter.nAtom * (parameter.nAtom - 1)) / 2);
@@ -38,6 +39,13 @@ Molecule::~Molecule()
 	delete[] atom_cos0;
 	delete[] G3_R2_sum;
 	delete[] G4_R2_sum;
+	for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
+		for (int iFunc = 0; iFunc < nFunc[iElement]; ++iFunc) {
+			delete[] cutoff_func[iElement][iFunc];
+		}
+		delete[] cutoff_func[iElement];
+	}
+	delete[] cutoff_func;
 }
 
 
@@ -62,11 +70,6 @@ void Molecule::GetInput(istream & Input) {
 }
 
 void Molecule::CalMidValue() {
-
-	nFunc.resize(parameter.nElement);
-	for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
-		nFunc[iElement] = pSymFunc->pFunctionInfo[iElement]->nFunc;
-	}
 
 	int iAtom, jAtom, kAtom;
 	const int nAtom = parameter.nAtom;
