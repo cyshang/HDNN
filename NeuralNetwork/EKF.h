@@ -22,7 +22,7 @@ struct EKF :public Optimizer
 	double adaptive_decay;
 	double alpha;
 
-	int nWeight;
+	size_t nWeight;
 	double lambda0, lambda1;
 	double lambda;
 
