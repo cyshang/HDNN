@@ -6,6 +6,8 @@
 #include "MonteCarloSetting.h"
 #include <Eigen/Core>
 
+#define DECAY 0.93548387
+
 using std::getline;
 using std::string;
 using std::istringstream;
@@ -196,6 +198,7 @@ void SymFunction::SymFuncOpt()
 	double Err, lastErr;
 	double pseudoT = pMCsetting->initT;
 	double deltaEnergy;
+	double accept_rate = 0.5;
 	int nAccept = 0;
 	bool IfLastAccept = true;
 
@@ -250,19 +253,21 @@ void SymFunction::SymFuncOpt()
 				pFunctionInfo[iElement]->RestoreFunc();
 			}
 			IfLastAccept = false;
+			accept_rate *= DECAY;
 		}
 		else {
 			// Accept
 			++nAccept;
 			lastErr = Err;
 			IfLastAccept = true;
+			accept_rate = accept_rate * DECAY + (1 - DECAY);
 		}
 
 		lout << setw(6) << left << iEpoch;
 		lout << setw(12) << left << Err;
 		lout << setw(14) << left << deltaEnergy;
 		lout << setw(7) << left << IfLastAccept;
-		lout << setw(12) << left << static_cast<double>(nAccept) / iEpoch << endl;
+		lout << setw(12) << left << accept_rate << endl;
 		 
 
 		if (!(iEpoch%pMCsetting->T_step))
