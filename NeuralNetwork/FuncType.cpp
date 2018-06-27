@@ -193,3 +193,58 @@ void FuncType::Perturbation()
 	}
 	}
 }
+
+void FuncType::SetRandom()
+{
+	double temp;
+	switch (sym_func) {
+	case 1: {
+		//	sym_func = 1 : G2
+		do {
+			//	FuncParameter[1] : Rs
+			temp = RAND::Uniform(0, FuncParameter[0]);
+		} while (temp < 0 || temp > FuncParameter[0]);
+		FuncParameter[1] = temp;
+
+		do {
+			//	FuncParameter[2] : eta
+			temp = RAND::Uniform(0, pMCsetting->max_eta);
+		} while (temp < 0 || temp > pMCsetting->max_eta);
+		FuncParameter[2] = temp;
+
+		break;
+	}
+	case 2: {
+		//	sym_func = 2 : G3
+		do {
+			//	FuncParameter[2] : eta
+			temp = RAND::Uniform(0, pMCsetting->max_eta);
+		} while (temp < 0 || temp > pMCsetting->max_eta);
+		FuncParameter[2] = temp;
+
+		do {
+			//	FuncParameter[3] : xi
+			temp = RAND::Uniform(0, pMCsetting->max_xi);
+		} while (temp < 0 || temp > pMCsetting->max_xi);
+		FuncParameter[3] = temp;
+
+		break;
+	}
+
+	case 3: {
+		//	sym_func = 3 : G4
+		do {
+			// FuncParameter[2] : eta
+			temp = RAND::Uniform(0, pMCsetting->max_eta);
+		} while (temp < 0 || temp > pMCsetting->max_eta);
+		FuncParameter[2] = temp;
+
+		do {
+			//	FuncParameter[3] : xi
+			temp = RAND::Uniform(0, pMCsetting->max_xi);
+		} while (temp < 0 || temp > pMCsetting->max_xi);
+
+		break;
+	}
+	}
+}

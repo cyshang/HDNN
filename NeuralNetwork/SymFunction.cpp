@@ -11,6 +11,7 @@
 using std::getline;
 using std::string;
 using std::istringstream;
+using std::ostringstream;
 using std::ifstream;
 using std::ofstream;
 using std::setw;
@@ -189,121 +190,134 @@ void SymFunction::SymFuncOpt()
 	double runtime;
 	time_t rawtime, start_time, end_time;
 
-	time(&rawtime);
-	strftime(now_time, 20, "%Y.%m.%d %X", localtime(&rawtime));
 
-	LogName = parameter.output_folder + parameter.fMonteCarloLog;
-	lout.open(LogName.c_str(), ofstream::out);
+	for (int iOpt = 1; iOpt <= pMCsetting->OptTimes; ++iOpt) {
 
-	double Err, lastErr;
-	double pseudoT = pMCsetting->initT;
-	double deltaEnergy;
-	double accept_rate = 0.5;
-	int nAccept = 0;
-	bool IfLastAccept = true;
+		time(&rawtime);
+		strftime(now_time, 20, "%Y.%m.%d %X", localtime(&rawtime));
+		ostringstream To_string;
+		To_string << iOpt;
+		LogName = parameter.output_folder + parameter.fMonteCarloLog + To_string.str();
+		lout.open(LogName.c_str(), ofstream::out);
 
-	CalOutput();
-	pNetwork->ScaleX();
-	pNetwork->ScaleEnergy();
-	lastErr = pNetwork->TrainNetwork();
+		double Err, lastErr;
+		double pseudoT = pMCsetting->initT;
+		double deltaEnergy;
+		double accept_rate = 0.5;
+		int nAccept = 0;
+		bool IfLastAccept = true;
 
-	lout << now_time << endl << endl;
+		CalOutput();
+		pNetwork->ScaleX();
+		pNetwork->ScaleEnergy();
+		lastErr = pNetwork->TrainNetwork();
 
-	lout << "max eta: " << pMCsetting->max_eta << endl;
-	lout << "max xi: " << pMCsetting->max_xi << endl;
-	lout << "perturb step: " << pMCsetting->perturb_step << endl;
-	lout << "initT: " << pMCsetting->initT << endl;
-	lout << "T step: " << pMCsetting->T_step << endl;
-	lout << "decay rate: " << pMCsetting->decay_rate << endl;
-	lout << "maxEpoch: " << pMCsetting->OptEpoch << endl;
-	lout << endl;
+		lout << now_time << endl << endl;
 
-	lout << setw(6) << left << "Epoch";	
-	lout << setw(12) << left << "Err";
-	lout << setw(14) << left << "dEnergy";
-	lout << setw(7) << left << "Accept";
-	lout << setw(12) << left << "AcceptRate" << endl;
-	
+		lout << "max eta: " << pMCsetting->max_eta << endl;
+		lout << "max xi: " << pMCsetting->max_xi << endl;
+		lout << "perturb step: " << pMCsetting->perturb_step << endl;
+		lout << "initT: " << pMCsetting->initT << endl;
+		lout << "T step: " << pMCsetting->T_step << endl;
+		lout << "decay rate: " << pMCsetting->decay_rate << endl;
+		lout << "maxEpoch: " << pMCsetting->OptEpoch << endl;
+		lout << endl;
 
-	time(&start_time);
+		lout << setw(6) << left << "Epoch";
+		lout << setw(12) << left << "Err";
+		lout << setw(14) << left << "dEnergy";
+		lout << setw(7) << left << "Accept";
+		lout << setw(12) << left << "AcceptRate" << endl;
 
-	for (int iEpoch = 1; iEpoch <= pMCsetting->OptEpoch; ++iEpoch) {
+
+		time(&start_time);
+		for (int iEpoch = 1; iEpoch <= pMCsetting->OptEpoch; ++iEpoch) {
 #ifdef OUTPUT_TO_SCREEN
-		std::cout << "Epoch" << iEpoch << endl;
+			std::cout << "Epoch" << iEpoch << endl;
 #endif // OUTPUT_TO_SCREEN
 
-		int iElement;
-		if(IfLastAccept)
+			int iElement;
+			if (IfLastAccept)
+				for (iElement = 0; iElement < parameter.nElement; ++iElement) {
+					pFunctionInfo[iElement]->BackupFunc();
+				}
+
 			for (iElement = 0; iElement < parameter.nElement; ++iElement) {
-				pFunctionInfo[iElement]->BackupFunc();
+				pFunctionInfo[iElement]->PerturbFunc();
 			}
 
-		for (iElement = 0; iElement < parameter.nElement; ++iElement) {			
-			pFunctionInfo[iElement]->PerturbFunc();
-		}
+			CalOutput();
+			pNetwork->ScaleX();
 
-		CalOutput();		
-		pNetwork->ScaleX();
-
-		Err = pNetwork->TrainNetwork();
-		deltaEnergy = Err - lastErr;
-		if (RAND::Uniform(0, 1) > (std::exp(-1 * (Err - lastErr) / pseudoT))) {
-			//	Not accept
-			for (iElement = 0; iElement < parameter.nElement; ++iElement) {
-				pFunctionInfo[iElement]->RestoreFunc();
+			Err = pNetwork->TrainNetwork();
+			deltaEnergy = Err - lastErr;
+			if (RAND::Uniform(0, 1) > (std::exp(-1 * (Err - lastErr) / pseudoT))) {
+				//	Not accept
+				for (iElement = 0; iElement < parameter.nElement; ++iElement) {
+					pFunctionInfo[iElement]->RestoreFunc();
+				}
+				IfLastAccept = false;
+				accept_rate *= DECAY;
 			}
-			IfLastAccept = false;
-			accept_rate *= DECAY;
+			else {
+				// Accept
+				++nAccept;
+				lastErr = Err;
+				IfLastAccept = true;
+				accept_rate = accept_rate * DECAY + (1 - DECAY);
+			}
+
+			lout << setw(6) << left << iEpoch;
+			lout << setw(12) << left << Err;
+			lout << setw(14) << left << deltaEnergy;
+			lout << setw(7) << left << IfLastAccept;
+			lout << setw(12) << left << accept_rate << endl;
+
+
+			if (!(iEpoch%pMCsetting->T_step))
+				pseudoT *= pMCsetting->decay_rate;
+
+			if (!(iEpoch % pMCsetting->save_step)) {
+				SaveFuncInfo(lastErr, iOpt);
+			}
+
+			if (accept_rate < 1e-5)
+				break;
 		}
+
+		time(&end_time);
+		runtime = difftime(end_time, start_time);
+		time(&rawtime);
+		strftime(now_time, 20, "%Y.%m.%d %X", localtime(&rawtime));
+		lout << endl << now_time << endl;
+		if (runtime < 60)
+			lout << "Runtime: " << runtime << "s" << endl;
+		else if (runtime >= 60 && runtime < 3600)
+			lout << "Runtime: " << static_cast<int>(runtime / 60) << "min" << runtime - 60 * static_cast<int>(runtime / 60) << "s" << endl;
 		else {
-			// Accept
-			++nAccept;
-			lastErr = Err;
-			IfLastAccept = true;
-			accept_rate = accept_rate * DECAY + (1 - DECAY);
+			lout << "Runtime: " << static_cast<int>(runtime / 3600) << "hour, ";
+			lout << static_cast<int>((runtime - static_cast<int>(runtime / 3600) * 3600) / 60) << "min, ";
+			lout << runtime - 60 * static_cast<int>(runtime / 60) << "s" << endl;
 		}
 
-		lout << setw(6) << left << iEpoch;
-		lout << setw(12) << left << Err;
-		lout << setw(14) << left << deltaEnergy;
-		lout << setw(7) << left << IfLastAccept;
-		lout << setw(12) << left << accept_rate << endl;
-		 
+		lout.close();
 
-		if (!(iEpoch%pMCsetting->T_step))
-			pseudoT *= pMCsetting->decay_rate;
-
-		if (!(iEpoch % pMCsetting->save_step)) {
-			SaveFuncInfo(lastErr);
-		}
+		SaveFuncInfo(lastErr, iOpt);
 	}
-
-	time(&end_time);
-	runtime = difftime(end_time, start_time);
-	time(&rawtime);
-	strftime(now_time, 20, "%Y.%m.%d %X", localtime(&rawtime));
-	lout << endl << now_time << endl;
-	if (runtime < 60)
-		lout << "Runtime: " << runtime << "s" << endl;
-	else if (runtime >= 60 && runtime < 3600)
-		lout << "Runtime: " << static_cast<int>(runtime / 60) << "min" << runtime - 60 * static_cast<int>(runtime / 60) << "s" << endl;
-	else {
-		lout << "Runtime: " << static_cast<int>(runtime / 3600) << "hour, ";
-		lout << static_cast<int>((runtime - static_cast<int>(runtime / 3600) * 3600) / 60) << "min, ";
-		lout << runtime - 60 * static_cast<int>(runtime / 60) << "s" << endl;
-	}
-
-	lout.close();
-
-	SaveFuncInfo(lastErr);
 }
 
-void SymFunction::SaveFuncInfo(double Err)
+void SymFunction::SaveFuncInfo(double Err, int iOpt)
 {
 	string FileSave;
 	ofstream fout;
-
-	FileSave = parameter.output_folder + parameter.fFunctionSave;
+	if (parameter.run_mode == SYMFUNC_OPT) {
+		ostringstream To_string;
+		To_string << iOpt;
+		FileSave = parameter.output_folder + parameter.fFunctionSave + To_string.str();
+	}
+	else {
+		FileSave = parameter.output_folder + parameter.fFunctionSave;
+	}
 	fout.open(FileSave.c_str(), ofstream::out);
 	
 	if (parameter.run_mode == SYMFUNC_OPT)

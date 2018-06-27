@@ -43,11 +43,17 @@ void MonteCarloSetting::GetSetting()
 		else if (var == "OptEpoch") {
 			fin >> OptEpoch;
 		}
+		else if (var == "OptTimes") {
+			fin >> OptTimes;
+		}
 		else if (var == "T_step") {
 			fin >> T_step;
 		}
 		else if (var == "save_step") {
 			fin >> save_step;
+		}
+		else if (var == "RandStart") {
+			fin >> RandStart;
 		}
 
 		fin.ignore(1024, '\n');

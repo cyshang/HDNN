@@ -29,7 +29,7 @@ struct SymFunction {
 	bool GetData();
 	
 	void SymFuncOpt();
-	void SaveFuncInfo(double Err = 0);
+	void SaveFuncInfo(double Err = 0, int iOpt = 0);
 	void CalOutput();
 	void CalSymFunction();
 	void RunPES();

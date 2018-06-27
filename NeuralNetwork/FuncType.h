@@ -20,6 +20,7 @@ struct FuncType {
 	void Backup();
 	void Restore();
 	void Perturbation();
+	void SetRandom();
 	std::string OutputFuncType();
 };
 

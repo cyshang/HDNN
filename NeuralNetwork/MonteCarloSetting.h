@@ -17,7 +17,9 @@ struct MonteCarloSetting {
 	int save_step;
 	double decay_rate;
 	int OptEpoch;
-	
+	int OptTimes;
+	int RandStart;
+
 	MonteCarloSetting() {}
 	void GetSetting();
 };
