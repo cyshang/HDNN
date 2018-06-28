@@ -227,7 +227,7 @@ void SymFunction::SymFuncOpt()
 		lout << "T step: " << pMCsetting->T_step << endl;
 		lout << "save step: " << pMCsetting->save_step << endl;
 		lout << "decay rate: " << pMCsetting->decay_rate << endl;
-		lout << "maxEpoch: " << pMCsetting->OptEpoch << endl;
+		lout << "max epoch: " << pMCsetting->OptEpoch << endl;
 		lout << "opt times: " << pMCsetting->OptTimes << endl;
 		lout << "If Random: " << pMCsetting->RandStart << endl;
 		lout << endl;

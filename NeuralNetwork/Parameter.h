@@ -7,13 +7,13 @@
 #include <string>
 
 #ifndef TRAIN_NETWORK
-#define TRAIN_NETWORK "NeuralNetwork"
+#define TRAIN_NETWORK "Train"
 #endif
 #ifndef CALC_SYMFUNC
-#define CALC_SYMFUNC "SymFunction"
+#define CALC_SYMFUNC "Func"
 #endif
 #ifndef SYMFUNC_OPT
-#define SYMFUNC_OPT "SymFunc_Opt"
+#define SYMFUNC_OPT "Opt"
 #endif
 #ifndef RUN_PES
 #define RUN_PES "PES"
