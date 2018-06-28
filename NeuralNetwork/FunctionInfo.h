@@ -18,6 +18,7 @@ struct FunctionInfo {
 	~FunctionInfo();
 
 	void GetInfo(std::istream & getInfo, const int & _nFunc);
+	void SetRandom();
 	void OutputInfo(std::ostream & outInfo);
 	void BackupFunc();
 	void RestoreFunc();

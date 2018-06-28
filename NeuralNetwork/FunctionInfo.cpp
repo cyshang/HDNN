@@ -43,6 +43,13 @@ void FunctionInfo::OutputInfo(ostream & outInfo)
 	}
 }
 
+void FunctionInfo::SetRandom()
+{
+	for (int iFunc = 0; iFunc < nFunc; ++iFunc) {
+		funcType[iFunc].SetRandom();
+	}
+}
+
 void FunctionInfo::PerturbFunc()
 {
 	for (int iFunc = 0; iFunc < nFunc; ++iFunc) {

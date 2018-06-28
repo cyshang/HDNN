@@ -193,6 +193,12 @@ void SymFunction::SymFuncOpt()
 
 	for (int iOpt = 1; iOpt <= pMCsetting->OptTimes; ++iOpt) {
 
+		if (pMCsetting->RandStart) {
+			for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
+				pFunctionInfo[iElement]->SetRandom();
+			}
+		}
+
 		time(&rawtime);
 		strftime(now_time, 20, "%Y.%m.%d %X", localtime(&rawtime));
 		ostringstream To_string;
@@ -219,8 +225,11 @@ void SymFunction::SymFuncOpt()
 		lout << "perturb step: " << pMCsetting->perturb_step << endl;
 		lout << "initT: " << pMCsetting->initT << endl;
 		lout << "T step: " << pMCsetting->T_step << endl;
+		lout << "save step: " << pMCsetting->save_step << endl;
 		lout << "decay rate: " << pMCsetting->decay_rate << endl;
 		lout << "maxEpoch: " << pMCsetting->OptEpoch << endl;
+		lout << "opt times: " << pMCsetting->OptTimes << endl;
+		lout << "If Random: " << pMCsetting->RandStart << endl;
 		lout << endl;
 
 		lout << setw(6) << left << "Epoch";

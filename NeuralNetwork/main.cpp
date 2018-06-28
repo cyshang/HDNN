@@ -72,6 +72,7 @@ int main(void)
 			pSymFunc->GetData();
 			pSymFunc->SymFuncOpt(); 
 
+
 			delete pNetwork;
 			delete pSymFunc;
 
