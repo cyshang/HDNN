@@ -190,6 +190,7 @@ void SymFunction::SymFuncOpt()
 	double runtime;
 	time_t rawtime, start_time, end_time;
 
+	pNetwork->ScaleEnergy();
 
 	for (int iOpt = 1; iOpt <= pMCsetting->OptTimes; ++iOpt) {
 
@@ -214,8 +215,7 @@ void SymFunction::SymFuncOpt()
 		bool IfLastAccept = true;
 
 		CalOutput();
-		pNetwork->ScaleX();
-		pNetwork->ScaleEnergy();
+		pNetwork->ScaleX();		
 		lastErr = pNetwork->TrainNetwork();
 
 		lout << now_time << endl << endl;
