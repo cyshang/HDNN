@@ -33,6 +33,7 @@ struct SymFunction {
 	void CalOutput();
 	void CalSymFunction();
 	void RunPES();
+	void PES_Funcinfo();
 };
 
 #endif // !SYMFUNCTION_H_

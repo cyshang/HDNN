@@ -153,6 +153,17 @@ void GroupBase::SaveWeight(std::ostream & outWb)
 	}
 }
 
+void GroupBase::OutputWeight(std::ostream & outWb)
+{
+	int iLayer;
+	for (iLayer = 1; iLayer < nLayer; ++iLayer) {
+		Map<RowVectorXd> tW((SubNet[iLayer]->W).data(), (SubNet[iLayer]->W).size());
+		Map<RowVectorXd> tb((SubNet[iLayer]->b).data(), (SubNet[iLayer]->b).size());		
+		outWb << std::setprecision(16) << tW << " ";
+		outWb << std::setprecision(16) << tb << " ";
+	}
+}
+
 void GroupBase::LoadWeight(std::istream & inWb)
 {
 #ifdef DEBUG_GROUP

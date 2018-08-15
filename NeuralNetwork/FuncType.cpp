@@ -5,6 +5,8 @@ using std::istringstream;
 using std::ostringstream;
 using std::vector;
 using std::string;
+using std::left;
+using std::setw;
 
 const MonteCarloSetting * FuncType::pMCsetting = NULL;
 
@@ -247,4 +249,35 @@ void FuncType::SetRandom()
 		break;
 	}
 	}
+}
+
+std::string FuncType::OutputPES()
+{
+	ostringstream sout;
+
+	sout << setw(4) << left << sym_func;
+	
+	if (sym_func <= 1) {
+		sout << setw(4) << left << elements[0];
+		sout << setw(4) << left << 0;
+	}
+	else {
+		sout << setw(4) << left << elements[0];
+		sout << setw(4) << left << elements[1];
+	}
+
+	sout << std::setprecision(16) << std::scientific;
+	if (sym_func == 1) {
+		for (int i = 1; i < 3; ++i) {
+			sout << setw(25) << left << FuncParameter[i];
+		}
+		sout << setw(25) << left << 0;
+	}
+	else {
+		for (int i = 1; i < 4; ++i) {
+			sout << setw(25) << left << FuncParameter[i];
+		}
+	}
+
+	return sout.str();
 }

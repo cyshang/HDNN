@@ -203,8 +203,7 @@ void Optimizer::InitWeight()
 void Optimizer::OutputWeight(std::ostream & out)
 {	
 	for (int iGroup = 0; iGroup < nGroup; ++iGroup) {
-		pGroupBase[iGroup]->SaveWeight(out);
+		pGroupBase[iGroup]->OutputWeight(out);
 	}
-	out << endl;
 }
 

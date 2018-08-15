@@ -42,6 +42,7 @@ struct GroupBase
 	void RandWeight();
 	void SaveWeight(std::ostream & outW);
 	void LoadWeight(std::istream & inW);
+	void OutputWeight(std::ostream & outW);
 };
 
 #endif // !GROUP_H

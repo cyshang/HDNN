@@ -18,6 +18,11 @@
 #ifndef RUN_PES
 #define RUN_PES "PES"
 #endif
+#ifndef CONVERT_FUNCINFO
+#define CONVERT_FUNCINFO "Convert"
+#endif // !CONVERT_FUNCINFO
+
+
 
 #ifndef LMARK
 #define LMARK "<=========="

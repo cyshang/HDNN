@@ -138,7 +138,7 @@ void NeuralNetwork::ScaleX()
 	minX = rawX.rowwise().minCoeff();
 	avgX = rawX.rowwise().mean();
 
-	rawX = (rawX.colwise() - avgX).array().colwise() / (maxX - minX).array();
+	rawX = (rawX.colwise() - avgX).array().colwise() / (maxX - minX).array();	
 }
 
 void NeuralNetwork::ScaleEnergy()
@@ -147,7 +147,7 @@ void NeuralNetwork::ScaleEnergy()
 	minEnergy = rawEnergy.minCoeff();
 	avgEnergy = rawEnergy.mean();
 
-	rawEnergy = (rawEnergy.array() - avgEnergy) / (maxEnergy - minEnergy);
+	rawEnergy = (rawEnergy.array() - avgEnergy) / (maxEnergy - minEnergy);	
 }
 
 
@@ -264,54 +264,36 @@ void NeuralNetwork::OutputNetwork(const int & iFit)
 	OutputName = parameter.output_folder + parameter.fNetworkOut + To_string.str();
 	Nout.open(OutputName.c_str(), ofstream::out);
 
-	Nout << "nGroup\t" << networkinfo.nGroup << endl;
-
-	Nout << "nNet\t";
-	for (int iGroup = 0; iGroup < networkinfo.nGroup; ++iGroup) {
-		Nout << networkinfo.nNet[iGroup] << " ";
-	}
+	//--------------- Weight ---------------
+	optimizer->OutputWeight(Nout);
 	Nout << endl;
 
-	Nout << "nLayer\t";
-	for (int iGroup = 0; iGroup < networkinfo.nGroup; ++iGroup) {
-		Nout << networkinfo.nLayer[iGroup] << " ";
-	}
-	Nout << endl;
-
-	Nout << "nNeuron" << endl;
-	for (int iGroup = 0; iGroup < networkinfo.nGroup; ++iGroup) {
-		for (int iLayer = 0; iLayer < networkinfo.nLayer[iGroup]; ++iLayer) {
-			Nout << networkinfo.nNeuron[iGroup][iLayer] << " ";
-		}
-		Nout << endl;
-	}
-	Nout << endl;
-
-	Nout << "maxX" << endl;
-	for (int i = 0; i < dimX; ++i) {
-		Nout << setprecision(16) << maxX[i] << " ";
-	}
-	Nout << endl;
-
-	Nout << "minX" << endl;
+	//--------------- minX ---------------
 	for (int i = 0; i < dimX; ++i) {
 		Nout << setprecision(16) << minX[i] << " ";
 	}
 	Nout << endl;
 
-	Nout << "avgX" << endl;
+	//--------------- avgX ---------------
 	for (int i = 0; i < dimX; ++i) {
 		Nout << setprecision(16) << avgX[i] << " ";
 	}
-	Nout << endl << endl;
-
-	Nout << "maxEnergy\t" << maxEnergy << endl;
-	Nout << "minEnergy\t" << minEnergy << endl;
-	Nout << "avgEnergy\t" << avgEnergy << endl;
 	Nout << endl;
 
-	Nout << "Weight" << endl;
-	optimizer->OutputWeight(Nout);
+	//--------------- maxX ---------------
+	for (int i = 0; i < dimX; ++i) {
+		Nout << setprecision(16) << maxX[i] << " ";
+	}
+	Nout << endl;
+
+	//--------------- minEnergy ---------------
+	Nout << minEnergy << endl;
+
+	//--------------- avgEnergy ---------------
+	Nout << avgEnergy << endl;
+
+	//--------------- maxEnergy ---------------
+	Nout << maxEnergy << endl;
 
 	Nout.close();
 }
@@ -329,7 +311,6 @@ void NeuralNetwork::OutputDebug(std::ostream & out)
 	out << "inputX: " << inputX.rows() << "x" << inputX.cols() << endl;
 	out << "maxX: " << maxX.size() << endl;
 	out << "minX: " << minX.size() << endl;
-	out << "avgX: " << avgX.size() << endl;
 	out << "rawEnergy: " << rawEnergy.size() << endl;
 	out << "targetEnergy: " << targetEnergy.size() << endl;
 	out << endl;
@@ -338,11 +319,9 @@ void NeuralNetwork::OutputDebug(std::ostream & out)
 	out << LMARK << "inputX" << RMARK << endl << inputX << endl << endl;
 	out << LMARK << "maxX" << RMARK << endl << maxX << endl << endl;
 	out << LMARK << "minX" << RMARK << endl << minX << endl << endl;
-	out << LMARK << "avgX" << RMARK << endl << avgX << endl << endl;
 	out << LMARK << "rawEnergy" << RMARK << endl << rawEnergy << endl << endl;
 	out << LMARK << "targetEnergy" << RMARK << endl << targetEnergy << endl << endl;
 	out << "maxEnergy: " << maxEnergy << endl;
 	out << "minEnergy: " << minEnergy << endl;
-	out << "avgEnergy: " << avgEnergy << endl;
 	out << endl;
 }

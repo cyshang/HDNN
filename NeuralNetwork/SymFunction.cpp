@@ -31,26 +31,28 @@ SymFunction::SymFunction()
 		pFunctionInfo[iElement] = new FunctionInfo(iElement);
 	}
 
-	//Generate the vector of struct Molecule
-	pMolecules = new Molecule*[parameter.nSample];
-	for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
-		pMolecules[iSample] = new Molecule;
-	}
+	if (parameter.run_mode != CONVERT_FUNCINFO) {
+		//Generate the vector of struct Molecule
+		pMolecules = new Molecule*[parameter.nSample];
+		for (long iSample = 0; iSample < parameter.nSample; ++iSample) {
+			pMolecules[iSample] = new Molecule;
+		}
 
-	atom_list = new int[parameter.nAtom];
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		atom_list[iAtom] = parameter.element_to_num[parameter.atom_list[iAtom]];
-	}
+		atom_list = new int[parameter.nAtom];
+		for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+			atom_list[iAtom] = parameter.element_to_num[parameter.atom_list[iAtom]];
+		}
 
-	//Link the static pointer pSymFunc to struct SymFunction
-	Molecule::pSymFunc = this;
+		//Link the static pointer pSymFunc to struct SymFunction
+		Molecule::pSymFunc = this;
 
-	//If running mode is Monte Carlo Optimization, generate struct MonteCarloSetting
-	if (parameter.run_mode == SYMFUNC_OPT) {
+		//If running mode is Monte Carlo Optimization, generate struct MonteCarloSetting
+		if (parameter.run_mode == SYMFUNC_OPT) {
 
-		pMCsetting = new MonteCarloSetting;
-		//Link FuncType's static pointer <pMCsetting> to struct <MonteCarloSetting>
-		FuncType::pMCsetting = pMCsetting;
+			pMCsetting = new MonteCarloSetting;
+			//Link FuncType's static pointer <pMCsetting> to struct <MonteCarloSetting>
+			FuncType::pMCsetting = pMCsetting;
+		}
 	}
 }
 
@@ -62,20 +64,22 @@ SymFunction::~SymFunction()
 	}
 	delete[] pFunctionInfo;
 
-	for (long i = 0; i < parameter.nSample; ++i) {
-		delete pMolecules[i];
-	}
-	delete[] pMolecules;
+	if (parameter.run_mode != CONVERT_FUNCINFO) {
+		for (long i = 0; i < parameter.nSample; ++i) {
+			delete pMolecules[i];
+		}
+		delete[] pMolecules;
 
-	if (pMCsetting){
-		FuncType::pMCsetting = NULL;
-		delete pMCsetting;
+		if (pMCsetting) {
+			FuncType::pMCsetting = NULL;
+			delete pMCsetting;
+		}
+
+		delete[] atom_list;
+		delete[] nFunc;
+		delete[] outputX;
+		delete[] outputEnergy;
 	}
-	
-	delete[] atom_list;
-	delete[] nFunc;
-	delete[] outputX;
-	delete[] outputEnergy;
 }
 
 void SymFunction::Construct()
@@ -110,29 +114,30 @@ void SymFunction::Construct()
 	}
 	fin.close();
 
-	Molecule::nFunc.resize(parameter.nElement);
-	for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
-		Molecule::nFunc[iElement] = pFunctionInfo[iElement]->nFunc;
+	if (parameter.run_mode != CONVERT_FUNCINFO) {
+		Molecule::nFunc.resize(parameter.nElement);
+		for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
+			Molecule::nFunc[iElement] = pFunctionInfo[iElement]->nFunc;
+		}
+
+		if (parameter.run_mode == SYMFUNC_OPT) {
+			pMCsetting->GetSetting();
+		}
+
+		//Calculate static int <dimX> in struct <Molecule>
+		dimX = 0;
+		for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+			dimX += pFunctionInfo[atom_list[iAtom]]->nFunc;
+		}
+
+		nFunc = new int[parameter.nAtom];
+		for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
+			nFunc[iAtom] = pFunctionInfo[atom_list[iAtom]]->nFunc;
+		}
+
+		outputX = new double[parameter.nSample * dimX];
+		outputEnergy = new double[parameter.nSample];
 	}
-
-	if (parameter.run_mode == SYMFUNC_OPT) {
-		pMCsetting->GetSetting();
-	}
-
-	//Calculate static int <dimX> in struct <Molecule>
-	dimX = 0;
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		dimX += pFunctionInfo[atom_list[iAtom]]->nFunc;
-	}
-
-	nFunc = new int[parameter.nAtom];
-	for (int iAtom = 0; iAtom < parameter.nAtom; ++iAtom) {
-		nFunc[iAtom] = pFunctionInfo[atom_list[iAtom]]->nFunc;
-	}
-
-	outputX = new double[parameter.nSample * dimX];
-	outputEnergy = new double[parameter.nSample];
-
 }
 
 void SymFunction::LinkToNetwork(NeuralNetwork * _pNetwork)
@@ -464,4 +469,24 @@ void SymFunction::CalSymFunction()
 void SymFunction::RunPES()
 {
 	CalOutput();
+}
+
+void SymFunction::PES_Funcinfo()
+{
+	string FileFuncInfo;
+	ofstream fout;
+	int nFunc;
+
+	FileFuncInfo = parameter.input_folder + "PES_" + parameter.fFunctionInfo;
+	fout.open(FileFuncInfo.c_str(), ofstream::out);
+	
+	for (int iElement = 0; iElement < parameter.nElement; ++iElement) {
+		nFunc = pFunctionInfo[iElement]->nFunc;
+		fout << nFunc << endl;
+		for (int ifunc = 0; ifunc < nFunc; ++ifunc) {
+			fout << pFunctionInfo[iElement]->funcType[ifunc].OutputPES() << endl;
+		}
+	}
+	
+	fout.close();
 }

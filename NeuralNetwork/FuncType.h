@@ -22,6 +22,7 @@ struct FuncType {
 	void Perturbation();
 	void SetRandom();
 	std::string OutputFuncType();
+	std::string OutputPES();
 };
 
 #endif // !FUNCTYPE_H

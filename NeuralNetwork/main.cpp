@@ -89,6 +89,12 @@ int main(void)
 			pNetwork->RunPES();
 			*/
 		}
+		else if (parameter.run_mode == CONVERT_FUNCINFO) {
+			pSymFunc = new SymFunction;
+			pSymFunc->Construct();			
+			pSymFunc->PES_Funcinfo();
+			delete pSymFunc;
+		}
 	}
 	catch (const char * error_pos) {
 		std::cout << "Error in " << error_pos << std::endl;
