@@ -222,7 +222,8 @@ double NeuralNetwork::TrainNetwork()
 {
 	double minRMSE = 9e9;
 
-
+	tRMSE.resize(networkinfo.nFitting);
+	vRMSE.resize(networkinfo.nFitting);	
 
 	int iFit;
 	for (iFit = 0; iFit < networkinfo.nFitting; ++iFit) {
@@ -249,6 +250,17 @@ double NeuralNetwork::TrainNetwork()
 			OutputNetwork(iFit);
 		}
 	}
+
+	string FileName;
+	FileName = parameter.output_folder + "fitting_report.txt";
+	ofstream pout(FileName.c_str(), ofstream::out);
+
+	for (iFit = 0; iFit < networkinfo.nFitting; ++iFit) {
+		pout << std::setw(6) << std::left << iFit + 1;
+		pout << tRMSE[iFit] << " " << vRMSE[iFit] << endl;
+	}
+
+	pout.close();
 	
 	return minRMSE;
 }

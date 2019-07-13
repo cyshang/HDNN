@@ -38,6 +38,9 @@ struct NeuralNetwork
 
 	std::vector<int> RandomList;
 
+	std::vector<double> tRMSE;
+	std::vector<double> vRMSE;
+
 	NeuralNetwork();
 
 	~NeuralNetwork();

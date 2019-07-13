@@ -195,6 +195,10 @@ void LMBP::FittingControl(const int & iFit)
 				break;
 		}
 	}
+
+	pNetwork->tRMSE[iFit] = tRMSE;
+	pNetwork->vRMSE[iFit] = vRMSE;
+
 	if (pInfo->IfLog) {
 
 		time(&end_time);
